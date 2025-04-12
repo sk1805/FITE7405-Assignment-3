@@ -61,17 +61,13 @@ if __name__ == "__main__":
     try:
         S = float(input("Enter spot price: "))
         K = float(input("Enter strike price: "))
-        T = float(input("Enter time to maturity (years): "))
         r = float(input("Enter risk-free rate (decimal): "))
         q = float(input("Enter repo rate (decimal): "))
-        price = float(input("Enter option premium: "))
-        option_type = input("Enter option type (call/put): ").lower()
-        
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        
-        iv = implied_volatility(S, K, r, q, T, price, option_type)
-        print(f"\nImplied volatility: {iv:.10f}")
+        T = float(input("Enter time to maturity (years): "))
+        market_price = float(input("Enter option premium: "))
+        option_type = input("Enter option type (call/put): ")
+        implied_vol = implied_volatility(S, K, r, q, T, market_price, option_type)
+        print(f"\nImplied volatility: {implied_vol:.10f}")
         
     except ValueError as e:
         print(f"Error: {str(e)}")

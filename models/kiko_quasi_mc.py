@@ -62,21 +62,22 @@ def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
     
     # Generate quasi-random numbers using Sobol sequence
     sobol = qmc.Sobol(n, scramble=True)
-    Z = norm.ppf(sobol.random(10000))  # Using 10,000 paths
+    Z = norm.ppf(sobol.random(100000))  # Using 100,000 paths
     
     # Simulate stock paths
-    S_paths = np.zeros((10000, n+1))
+    S_paths = np.zeros((100000, n+1))
     S_paths[:, 0] = S
     
     for i in range(n):
         S_paths[:, i+1] = S_paths[:, i] * np.exp(drift + vol*Z[:, i])
     
     # Check for knock-in and knock-out conditions
-    knock_in = np.any(S_paths <= L, axis=1)
-    knock_out = np.any(S_paths >= U, axis=1)
+    eps = 1e-8
+    knock_in = np.any(S_paths <= L + eps, axis=1)
+    knock_out = np.any(S_paths >= U - eps, axis=1)
     
     # Calculate payoffs
-    payoffs = np.zeros(10000)
+    payoffs = np.zeros(100000)
     
     # Payoff for paths that knock out
     payoffs[knock_out] = R
@@ -111,7 +112,7 @@ if __name__ == "__main__":
         U = float(input("Enter upper barrier: "))
         R = float(input("Enter cash rebate: "))
         n = int(input("Enter number of observation times: "))
-        
+        # calculate_delta = input("Calculate Delta? (y/n): ").lower() == 'y'
         if L >= U:
             raise ValueError("Lower barrier must be less than upper barrier")
         if R < 0:

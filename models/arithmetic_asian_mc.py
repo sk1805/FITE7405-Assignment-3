@@ -2,7 +2,7 @@ import numpy as np
 from models.geometric_asian import geometric_asian
 from scipy.stats import norm
 
-def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, control_variate):
+def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, control_variate=None):
     """
     Calculate the price of an arithmetic Asian option using Monte Carlo simulation with control variate.
     
@@ -72,10 +72,16 @@ def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, con
     # Calculate arithmetic and geometric averages
     arithmetic_avg = np.mean(S_paths[:, 1:], axis=1)
     geometric_avg = np.exp(np.mean(np.log(S_paths[:, 1:]), axis=1))
-    
     # Calculate payoffs
-    arithmetic_payoffs = np.maximum(arithmetic_avg - K, 0)
-    geometric_payoffs = np.maximum(geometric_avg - K, 0)
+    if option_type == 'call':
+        arithmetic_payoffs = np.maximum(arithmetic_avg - K, 0)
+        geometric_payoffs = np.maximum(geometric_avg - K, 0)
+    elif option_type == 'put':
+        arithmetic_payoffs = np.maximum(K - arithmetic_avg, 0)
+        geometric_payoffs = np.maximum(K - geometric_avg, 0)
+    else:
+        raise ValueError("Invalid option_type. Must be 'call' or 'put'.")
+
     
     # If control variate is specified, adjust the payoffs
     if control_variate == 'geometric':
@@ -101,14 +107,14 @@ def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, con
 if __name__ == "__main__":
     try:
         S0 = float(input("Enter spot price: "))
-        sigma = float(input("Enter volatility: "))
-        r = float(input("Enter risk-free rate: "))
-        T = float(input("Enter time to maturity: "))
+        sigma = float(input("Enter volatility (decimal): "))
+        r = float(input("Enter risk-free rate (decimal): "))
+        T = float(input("Enter time to maturity (years): "))
         K = float(input("Enter strike price: "))
         n = int(input("Enter number of observation times: "))
-        option_type = input("Enter option type (call or put): ").lower()
+        option_type = input("Enter option type (call/put): ")
         num_simulations = int(input("Enter number of simulations: "))
-        control_variate = input("Enter control variate method (none or geometric): ").lower()
+        control_variate = input("Enter control variate method (none/geometric): ")
         
         price, stderr = arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, control_variate)
         print(f"\nOption price: {price:.10f}")

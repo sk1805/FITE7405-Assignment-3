@@ -43,29 +43,26 @@ def american_binomial(S, K, r, T, sigma, N, option_type):
     d = 1 / u  # Down factor
     p = (np.exp(r * dt) - d) / (u - d)  # Risk-neutral probability
 
-    # Initialize asset prices at maturity
-    asset_prices = np.zeros(N + 1)
-    for i in range(N + 1):
-        asset_prices[i] = S * (u ** (N - i)) * (d ** i)
+    # Terminal asset prices
+    asset_prices = S * u ** np.arange(N, -1, -1) * d ** np.arange(0, N + 1)
+    
+    # Terminal option values
+    if option_type == 'call':
+        option_values = np.maximum(0, asset_prices - K)
+    else:
+        option_values = np.maximum(0, K - asset_prices)
 
-    # Initialize option values at maturity
-    option_values = np.zeros(N + 1)
-    for i in range(N + 1):
-        if option_type == 'call':
-            option_values[i] = max(0, asset_prices[i] - K)
-        else:
-            option_values[i] = max(0, K - asset_prices[i])
-
-    # Backward induction for American option pricing
+    # Backward induction
     for j in range(N - 1, -1, -1):
         for i in range(j + 1):
-            option_values[i] = np.exp(-r * dt) * (p * option_values[i] + (1 - p) * option_values[i + 1])
-            # Check for early exercise
+            option_value = np.exp(-r * dt) * (p * option_values[i] + (1 - p) * option_values[i + 1])
+            asset_price = S * (u ** (j - i)) * (d ** i)
             if option_type == 'call':
-                option_values[i] = max(option_values[i], asset_prices[i] - K)
+                exercise_value = max(0, asset_price - K)
             else:
-                option_values[i] = max(option_values[i], K - asset_prices[i])
-
+                exercise_value = max(0, K - asset_price)
+            option_values[i] = max(option_value, exercise_value)
+            
     return option_values[0]
 
 if __name__ == "__main__":
@@ -75,13 +72,13 @@ if __name__ == "__main__":
         r = float(input("Enter risk-free rate (decimal): "))
         T = float(input("Enter time to maturity (years): "))
         sigma = float(input("Enter volatility (decimal): "))
-        n = int(input("Enter number of time steps: "))
-        option_type = input("Enter option type (call/put): ").lower()
+        N = int(input("Enter number of steps: "))
+        option_type = input("Enter option type (call/put): ")
         
         if option_type not in ['call', 'put']:
             raise ValueError("Option type must be either 'call' or 'put'")
         
-        price = american_binomial(S, K, r, T, sigma, n, option_type)
+        price = american_binomial(S, K, r, T, sigma, N, option_type)
         print(f"\n{option_type.capitalize()} option price: {price:.10f}")
         
     except ValueError as e:

@@ -63,12 +63,12 @@ def geometric_asian(S0, sigma, r, T, K, n, option_type):
 if __name__ == "__main__":
     try:
         S0 = float(input("Enter spot price: "))
-        K = float(input("Enter strike price: "))
+        sigma = float(input("Enter volatility (decimal): "))
         r = float(input("Enter risk-free rate (decimal): "))
         T = float(input("Enter time to maturity (years): "))
-        sigma = float(input("Enter volatility (decimal): "))
+        K = float(input("Enter strike price: "))
         n = int(input("Enter number of observation times: "))
-        option_type = input("Enter option type (call/put): ").lower()
+        option_type = input("Enter option type (call/put): ")
         
         if option_type not in ['call', 'put']:
             raise ValueError("Option type must be either 'call' or 'put'")

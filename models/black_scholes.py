@@ -60,13 +60,14 @@ def run():
     print("=====================================")
     
     try:
-        S = float(input("Enter current stock price: "))
+        S = float(input("Enter spot price: "))
         K = float(input("Enter strike price: "))
-        T = float(input("Enter time to maturity (years): "))
         r = float(input("Enter risk-free rate (decimal): "))
         q = float(input("Enter repo rate (decimal): "))
+        T = float(input("Enter time to maturity (years): "))
         sigma = float(input("Enter volatility (decimal): "))
-        option_type = input("Enter option type (call/put): ").lower()
+        option_type = input("Enter option type (call/put): ")
+        price = black_scholes(S, K, r, q, T, sigma, option_type)
         
         if option_type not in ['call', 'put']:
             raise ValueError("Option type must be either 'call' or 'put'")
