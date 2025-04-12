@@ -1,5 +1,5 @@
 import numpy as np
-from geometric_asian import geometric_asian
+from models.geometric_asian import geometric_asian
 
 def arithmetic_asian_mc(S, K, r, T, sigma, n, N, control_variate='none', option_type='call'):
     """

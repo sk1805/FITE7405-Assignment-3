@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import brentq
-from black_scholes import black_scholes
+from models.black_scholes import black_scholes
 
 def implied_volatility(S, K, r, q, T, price, option_type='call'):
     """

@@ -1,7 +1,6 @@
 import dash
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
-import streamlit as st
 import numpy as np
 from models.black_scholes import black_scholes
 from models.implied_volatility import implied_volatility

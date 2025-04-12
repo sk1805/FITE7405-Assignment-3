@@ -1,5 +1,5 @@
 import numpy as np
-from geometric_basket import geometric_basket
+from models.geometric_basket import geometric_basket
 
 def arithmetic_basket_mc(S1, S2, K, r, T, sigma1, sigma2, rho, N, control_variate='none', option_type='call'):
     """
