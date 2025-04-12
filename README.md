@@ -26,8 +26,7 @@ A comprehensive Python implementation of various option pricing models.
 ## Installation
 
 ```bash
-git clone https://github.com/yourusername/option-pricing-models.git
-cd option-pricing-models
+git clone https://github.com/sk1805/FITE7405-Assignment-3.git
 pip install -r requirements.txt
 ```
 
