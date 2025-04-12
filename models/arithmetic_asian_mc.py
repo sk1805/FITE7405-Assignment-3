@@ -1,109 +1,117 @@
 import numpy as np
 from models.geometric_asian import geometric_asian
+from scipy.stats import norm
 
-def arithmetic_asian_mc(S, K, r, T, sigma, n, N, control_variate='none', option_type='call'):
+def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, control_variate):
     """
-    Calculate the price of an arithmetic Asian option using Monte Carlo simulation.
+    Calculate the price of an arithmetic Asian option using Monte Carlo simulation with control variate.
     
     Parameters:
     -----------
-    S : float
+    S0 : float
         Spot price of the underlying asset (S(0))
-    K : float
-        Strike price
+    sigma : float
+        Volatility of the underlying asset
     r : float
         Risk-free interest rate
     T : float
         Time to maturity in years
-    sigma : float
-        Volatility of the underlying asset
+    K : float
+        Strike price
     n : int
-        Number of observation times
-    N : int
-        Number of simulation paths
-    control_variate : str, optional
-        Control variate method ('none' or 'geometric')
-    option_type : str, optional
+        Number of observation times for the arithmetic average
+    option_type : str
         Type of option ('call' or 'put')
+    num_simulations : int
+        Number of simulations for Monte Carlo
+    control_variate : str
+        Control variate method ('none' or 'geometric')
     
     Returns:
     --------
     tuple
         (Option price, Standard error)
     """
+    # Validate input parameters
+    if S0 <= 0:
+        raise ValueError("Spot price S(0) must be positive.")
+    if K <= 0:
+        raise ValueError("Strike price K must be positive.")
+    if sigma <= 0:
+        raise ValueError("Volatility sigma must be positive.")
+    if r < 0:
+        raise ValueError("Risk-free rate r must be non-negative.")
+    if T <= 0:
+        raise ValueError("Time to maturity T must be positive.")
+    if n <= 0:
+        raise ValueError("Number of observation times n must be positive.")
+    if num_simulations <= 0:
+        raise ValueError("Number of simulations must be positive.")
+    if control_variate not in ['none', 'geometric']:
+        raise ValueError("Control variate method must be either 'none' or 'geometric'.")
+    if option_type not in ['call', 'put']:
+        raise ValueError("Option type must be either 'call' or 'put'.")
+
+    # Set fixed seed for reproducibility
+    np.random.seed(42)
+    
     dt = T/n
     drift = (r - 0.5*sigma**2)*dt
     vol = sigma*np.sqrt(dt)
     
     # Generate random numbers
-    Z = np.random.normal(0, 1, (N, n))
+    Z = np.random.normal(0, 1, (num_simulations, n))
     
     # Simulate stock paths
-    S_paths = np.zeros((N, n+1))
-    S_paths[:, 0] = S
+    S_paths = np.zeros((num_simulations, n+1))
+    S_paths[:, 0] = S0
     
     for i in range(n):
         S_paths[:, i+1] = S_paths[:, i] * np.exp(drift + vol*Z[:, i])
     
-    # Calculate arithmetic averages
-    A = np.mean(S_paths[:, 1:], axis=1)
+    # Calculate arithmetic and geometric averages
+    arithmetic_avg = np.mean(S_paths[:, 1:], axis=1)
+    geometric_avg = np.exp(np.mean(np.log(S_paths[:, 1:]), axis=1))
     
     # Calculate payoffs
-    if option_type.lower() == 'call':
-        payoffs = np.maximum(A - K, 0)
-    elif option_type.lower() == 'put':
-        payoffs = np.maximum(K - A, 0)
-    else:
-        raise ValueError("Option type must be either 'call' or 'put'")
+    arithmetic_payoffs = np.maximum(arithmetic_avg - K, 0)
+    geometric_payoffs = np.maximum(geometric_avg - K, 0)
     
-    # Calculate option price without control variate
-    price = np.exp(-r*T) * np.mean(payoffs)
-    stderr = np.exp(-r*T) * np.std(payoffs) / np.sqrt(N)
-    
-    if control_variate.lower() == 'geometric':
-        # Calculate geometric Asian option price
-        geo_price = geometric_asian(S, K, r, T, sigma, n, option_type)
-        
-        # Calculate geometric averages
-        G = np.exp(np.mean(np.log(S_paths[:, 1:]), axis=1))
-        
-        # Calculate geometric payoffs
-        if option_type.lower() == 'call':
-            geo_payoffs = np.maximum(G - K, 0)
-        else:
-            geo_payoffs = np.maximum(K - G, 0)
+    # If control variate is specified, adjust the payoffs
+    if control_variate == 'geometric':
+        # Calculate the geometric Asian option price
+        geometric_price = geometric_asian(S0, sigma, r, T, K, n, option_type)
         
         # Calculate control variate coefficient
-        cov = np.cov(payoffs, geo_payoffs)[0, 1]
-        var = np.var(geo_payoffs)
+        cov = np.cov(arithmetic_payoffs, geometric_payoffs)[0, 1]
+        var = np.var(geometric_payoffs)
         beta = cov / var
         
-        # Apply control variate
-        cv_payoffs = payoffs - beta * (geo_payoffs - np.exp(r*T)*geo_price)
-        price = np.exp(-r*T) * np.mean(cv_payoffs)
-        stderr = np.exp(-r*T) * np.std(cv_payoffs) / np.sqrt(N)
+        # Adjust payoffs using control variate
+        adjusted_payoffs = arithmetic_payoffs - beta * (geometric_payoffs - geometric_price)
+    else:
+        adjusted_payoffs = arithmetic_payoffs
+    
+    # Calculate option price and standard error
+    price = np.exp(-r*T) * np.mean(adjusted_payoffs)
+    stderr = np.exp(-r*T) * np.std(adjusted_payoffs) / np.sqrt(num_simulations)
     
     return price, stderr
 
 if __name__ == "__main__":
     try:
-        S = float(input("Enter spot price: "))
+        S0 = float(input("Enter spot price: "))
+        sigma = float(input("Enter volatility: "))
+        r = float(input("Enter risk-free rate: "))
+        T = float(input("Enter time to maturity: "))
         K = float(input("Enter strike price: "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        sigma = float(input("Enter volatility (decimal): "))
         n = int(input("Enter number of observation times: "))
-        N = int(input("Enter number of simulation paths: "))
-        control_variate = input("Enter control variate method (none/geometric): ").lower()
-        option_type = input("Enter option type (call/put): ").lower()
+        option_type = input("Enter option type (call or put): ").lower()
+        num_simulations = int(input("Enter number of simulations: "))
+        control_variate = input("Enter control variate method (none or geometric): ").lower()
         
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        if control_variate not in ['none', 'geometric']:
-            raise ValueError("Control variate method must be either 'none' or 'geometric'")
-        
-        price, stderr = arithmetic_asian_mc(S, K, r, T, sigma, n, N, control_variate, option_type)
-        print(f"\n{option_type.capitalize()} option price: {price:.10f}")
+        price, stderr = arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, control_variate)
+        print(f"\nOption price: {price:.10f}")
         print(f"Standard error: {stderr:.10f}")
         print(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
         

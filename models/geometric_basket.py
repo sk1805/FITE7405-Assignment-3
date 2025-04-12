@@ -1,54 +1,62 @@
 import numpy as np
 from scipy.stats import norm
 
-def geometric_basket(S1, S2, K, r, T, sigma1, sigma2, rho, option_type='call'):
+def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     """
     Calculate the price of a geometric basket option.
-    
+
     Parameters:
     -----------
     S1 : float
-        Spot price of the first underlying asset (S1(0))
+        Spot price of the first asset (S1(0))
     S2 : float
-        Spot price of the second underlying asset (S2(0))
-    K : float
-        Strike price
+        Spot price of the second asset (S2(0))
+    sigma1 : float
+        Volatility of the first asset
+    sigma2 : float
+        Volatility of the second asset
     r : float
         Risk-free interest rate
     T : float
         Time to maturity in years
-    sigma1 : float
-        Volatility of the first underlying asset
-    sigma2 : float
-        Volatility of the second underlying asset
+    K : float
+        Strike price
     rho : float
-        Correlation between the two underlying assets
-    option_type : str, optional
+        Correlation between the two assets
+    option_type : str
         Type of option ('call' or 'put')
-    
-    Returns:
-    --------
-    float
-        Option price
     """
-    # Calculate geometric average of initial prices
-    S0 = np.sqrt(S1 * S2)
-    
-    # Calculate adjusted parameters for geometric basket
-    sigma = np.sqrt(0.5 * (sigma1**2 + sigma2**2 + 2*rho*sigma1*sigma2))
-    mu = r - 0.5 * (sigma1**2 + sigma2**2)/2 + 0.5 * sigma**2
-    
-    # Calculate d1 and d2
-    d1 = (np.log(S0/K) + (mu + 0.5*sigma**2)*T) / (sigma*np.sqrt(T))
-    d2 = d1 - sigma*np.sqrt(T)
-    
-    if option_type.lower() == 'call':
-        price = np.exp(-r*T) * (S0*np.exp(mu*T)*norm.cdf(d1) - K*norm.cdf(d2))
-    elif option_type.lower() == 'put':
-        price = np.exp(-r*T) * (K*norm.cdf(-d2) - S0*np.exp(mu*T)*norm.cdf(-d1))
+    # Validate input parameters
+    if S1 <= 0:
+        raise ValueError("Spot price S1(0) must be positive.")
+    if S2 <= 0:
+        raise ValueError("Spot price S2(0) must be positive.")
+    if sigma1 <= 0:
+        raise ValueError("Volatility sigma1 must be positive.")
+    if sigma2 <= 0:
+        raise ValueError("Volatility sigma2 must be positive.")
+    if r < 0:
+        raise ValueError("Risk-free rate r must be non-negative.")
+    if T <= 0:
+        raise ValueError("Time to maturity T must be positive.")
+    if K <= 0:
+        raise ValueError("Strike price K must be positive.")
+    if not (-1 <= rho <= 1):
+        raise ValueError("Correlation rho must be between -1 and 1.")
+    if option_type not in ['call', 'put']:
+        raise ValueError("Option type must be either 'call' or 'put'.")
+
+    # Calculate d1 and d2 for the geometric basket option
+    sigma_g = np.sqrt((sigma1 ** 2 + sigma2 ** 2 + 2 * rho * sigma1 * sigma2))
+    d1 = (np.log(S1 / S2) + (r + 0.5 * sigma_g ** 2) * T) / (sigma_g * np.sqrt(T))
+    d2 = d1 - sigma_g * np.sqrt(T)
+
+    # Calculate option price based on type
+    if option_type == 'call':
+        price = np.exp(-r * T) * (S1 * norm.cdf(d1) - K * norm.cdf(d2))
     else:
-        raise ValueError("Option type must be either 'call' or 'put'")
-    
+        price = np.exp(-r * T) * (K * norm.cdf(-d2) - S1 * norm.cdf(-d1))
+
     return price
 
 if __name__ == "__main__":
@@ -68,7 +76,7 @@ if __name__ == "__main__":
         if rho < -1 or rho > 1:
             raise ValueError("Correlation must be between -1 and 1")
         
-        price = geometric_basket(S1, S2, K, r, T, sigma1, sigma2, rho, option_type)
+        price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
         print(f"\n{option_type.capitalize()} option price: {price:.10f}")
         
     except ValueError as e:

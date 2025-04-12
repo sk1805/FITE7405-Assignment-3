@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 
-def black_scholes(S, K, r, q, T, sigma, option_type='call'):
+def black_scholes(S, K, r, q, T, sigma, option_type):
     """
     Calculate the price of a European option using the Black-Scholes model.
     
@@ -19,7 +19,7 @@ def black_scholes(S, K, r, q, T, sigma, option_type='call'):
         Time to maturity in years
     sigma : float
         Volatility of the underlying asset
-    option_type : str, optional
+    option_type : str
         Type of option ('call' or 'put')
     
     Returns:
@@ -27,16 +27,32 @@ def black_scholes(S, K, r, q, T, sigma, option_type='call'):
     float
         Option price
     """
-    d1 = (np.log(S/K) + (r - q + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-    d2 = d1 - sigma * np.sqrt(T)
-    
-    if option_type.lower() == 'call':
-        price = S * np.exp(-q * T) * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
-    elif option_type.lower() == 'put':
-        price = K * np.exp(-r * T) * norm.cdf(-d2) - S * np.exp(-q * T) * norm.cdf(-d1)
-    else:
+    # Validate input parameters
+    if S <= 0:
+        raise ValueError("Spot price S must be positive.")
+    if K <= 0:
+        raise ValueError("Strike price K must be positive.")
+    if r < 0:
+        raise ValueError("Risk-free rate r must be non-negative.")
+    if q < 0:
+        raise ValueError("Repo rate q must be non-negative.")
+    if T <= 0:
+        raise ValueError("Time to maturity T must be positive.")
+    if sigma <= 0:
+        raise ValueError("Volatility sigma must be positive.")
+    if option_type not in ['call', 'put']:
         raise ValueError("Option type must be either 'call' or 'put'")
-    
+
+    # Calculate d1 and d2
+    d1 = (np.log(S / K) + (r - q + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    d2 = d1 - sigma * np.sqrt(T)
+
+    # Calculate option price based on type
+    if option_type == 'call':
+        price = S * np.exp(-q * T) * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+    else:
+        price = K * np.exp(-r * T) * norm.cdf(-d2) - S * np.exp(-q * T) * norm.cdf(-d1)
+
     return price
 
 def run():

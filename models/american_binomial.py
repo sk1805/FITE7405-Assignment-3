@@ -1,9 +1,9 @@
 import numpy as np
 
-def american_binomial(S, K, r, T, sigma, n, option_type='call'):
+def american_binomial(S, K, r, T, sigma, N, option_type):
     """
-    Calculate the price of an American option using the binomial tree method.
-    
+    Calculate the price of an American call/put option using the binomial tree method.
+
     Parameters:
     -----------
     S : float
@@ -16,57 +16,57 @@ def american_binomial(S, K, r, T, sigma, n, option_type='call'):
         Time to maturity in years
     sigma : float
         Volatility of the underlying asset
-    n : int
-        Number of time steps
-    option_type : str, optional
+    N : int
+        Number of steps in the binomial tree
+    option_type : str
         Type of option ('call' or 'put')
-    
-    Returns:
-    --------
-    float
-        Option price
     """
-    dt = T/n
-    u = np.exp(sigma * np.sqrt(dt))
-    d = 1/u
-    p = (np.exp(r*dt) - d)/(u - d)
-    
-    # Initialize stock price tree
-    stock_tree = np.zeros((n+1, n+1))
-    stock_tree[0, 0] = S
-    
-    for i in range(1, n+1):
-        stock_tree[i, 0] = stock_tree[i-1, 0] * u
-        for j in range(1, i+1):
-            stock_tree[i, j] = stock_tree[i-1, j-1] * d
-    
-    # Initialize option value tree
-    option_tree = np.zeros((n+1, n+1))
-    
-    # Calculate terminal option values
-    if option_type.lower() == 'call':
-        option_tree[n, :] = np.maximum(stock_tree[n, :] - K, 0)
-    elif option_type.lower() == 'put':
-        option_tree[n, :] = np.maximum(K - stock_tree[n, :], 0)
-    else:
+    # Validate input parameters
+    if S <= 0:
+        raise ValueError("Spot price S must be positive.")
+    if K <= 0:
+        raise ValueError("Strike price K must be positive.")
+    if r < 0:
+        raise ValueError("Risk-free rate r must be non-negative.")
+    if T <= 0:
+        raise ValueError("Time to maturity T must be positive.")
+    if sigma <= 0:
+        raise ValueError("Volatility sigma must be positive.")
+    if N <= 0:
+        raise ValueError("Number of steps N must be positive.")
+    if option_type not in ['call', 'put']:
         raise ValueError("Option type must be either 'call' or 'put'")
-    
-    # Backward induction
-    for i in range(n-1, -1, -1):
-        for j in range(i+1):
-            # Calculate continuation value
-            continuation_value = np.exp(-r*dt) * (p*option_tree[i+1, j] + (1-p)*option_tree[i+1, j+1])
-            
-            # Calculate exercise value
-            if option_type.lower() == 'call':
-                exercise_value = max(stock_tree[i, j] - K, 0)
+
+    # Binomial tree parameters
+    dt = T / N
+    u = np.exp(sigma * np.sqrt(dt))  # Up factor
+    d = 1 / u  # Down factor
+    p = (np.exp(r * dt) - d) / (u - d)  # Risk-neutral probability
+
+    # Initialize asset prices at maturity
+    asset_prices = np.zeros(N + 1)
+    for i in range(N + 1):
+        asset_prices[i] = S * (u ** (N - i)) * (d ** i)
+
+    # Initialize option values at maturity
+    option_values = np.zeros(N + 1)
+    for i in range(N + 1):
+        if option_type == 'call':
+            option_values[i] = max(0, asset_prices[i] - K)
+        else:
+            option_values[i] = max(0, K - asset_prices[i])
+
+    # Backward induction for American option pricing
+    for j in range(N - 1, -1, -1):
+        for i in range(j + 1):
+            option_values[i] = np.exp(-r * dt) * (p * option_values[i] + (1 - p) * option_values[i + 1])
+            # Check for early exercise
+            if option_type == 'call':
+                option_values[i] = max(option_values[i], asset_prices[i] - K)
             else:
-                exercise_value = max(K - stock_tree[i, j], 0)
-            
-            # Take maximum of continuation and exercise values
-            option_tree[i, j] = max(continuation_value, exercise_value)
-    
-    return option_tree[0, 0]
+                option_values[i] = max(option_values[i], K - asset_prices[i])
+
+    return option_values[0]
 
 if __name__ == "__main__":
     try:

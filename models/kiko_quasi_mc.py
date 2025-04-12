@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import norm
+from scipy.stats import qmc
 
 def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
     """
@@ -34,12 +35,32 @@ def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
         (Option price, Standard error, Delta) if calculate_delta is True
         (Option price, Standard error) otherwise
     """
+    # Set fixed seed for reproducibility
+    np.random.seed(42)
+    
+    # Validate input parameters
+    if S <= 0:
+        raise ValueError("Spot price S must be positive.")
+    if K <= 0:
+        raise ValueError("Strike price K must be positive.")
+    if sigma <= 0:
+        raise ValueError("Volatility sigma must be positive.")
+    if r < 0:
+        raise ValueError("Risk-free rate r must be non-negative.")
+    if T <= 0:
+        raise ValueError("Time to maturity T must be positive.")
+    if L >= U:
+        raise ValueError("Lower barrier L must be less than upper barrier U.")
+    if R < 0:
+        raise ValueError("Cash rebate R must be non-negative.")
+    if n <= 0:
+        raise ValueError("Number of observation times n must be positive.")
+    
     dt = T/n
     drift = (r - 0.5*sigma**2)*dt
     vol = sigma*np.sqrt(dt)
     
     # Generate quasi-random numbers using Sobol sequence
-    from scipy.stats import qmc
     sobol = qmc.Sobol(n, scramble=True)
     Z = norm.ppf(sobol.random(10000))  # Using 10,000 paths
     

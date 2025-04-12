@@ -731,4 +731,3 @@ def calculate_kiko(n_clicks, S, K, r, T, sigma, L, U, R, n):
 
 if __name__ == "__main__":
     app.run_server(debug=True) 
-    app.run_server(debug=True) 
