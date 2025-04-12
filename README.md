@@ -57,6 +57,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Your Name - [your.email@example.com]
+Your Name - [Sameer Kabani]
 
-Project Link: [https://github.com/yourusername/option-pricing-calculator](https://github.com/yourusername/option-pricing-calculator) 
+Project Link: https://github.com/sk1805/FITE7405-Assignment-3
