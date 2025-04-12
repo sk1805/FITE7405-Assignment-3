@@ -1,5 +1,13 @@
 import sys
 import importlib
+from models.black_scholes import black_scholes
+from models.implied_volatility import implied_volatility
+from models.geometric_asian import geometric_asian
+from models.arithmetic_asian_mc import arithmetic_asian_mc
+from models.geometric_basket import geometric_basket
+from models.arithmetic_basket_mc import arithmetic_basket_mc
+from models.american_binomial import american_binomial
+from models.kiko_quasi_mc import kiko_quasi_mc
 
 def main():
     while True:
@@ -20,35 +28,27 @@ def main():
 
         try:
             if choice == "1":
-                import black_scholes
                 importlib.reload(black_scholes)  # Reload the module
                 black_scholes.run()
             elif choice == "2":
-                import implied_volatility
                 importlib.reload(implied_volatility)
                 implied_volatility.run()
             elif choice == "3":
-                import geometric_asian
                 importlib.reload(geometric_asian)
                 geometric_asian.run()
             elif choice == "4":
-                import arithmetic_asian_mc
                 importlib.reload(arithmetic_asian_mc)
                 arithmetic_asian_mc.run()
             elif choice == "5":
-                import geometric_basket
                 importlib.reload(geometric_basket)
                 geometric_basket.run()
             elif choice == "6":
-                import arithmetic_basket_mc
                 importlib.reload(arithmetic_basket_mc)
                 arithmetic_basket_mc.run()
             elif choice == "7":
-                import american_binomial
                 importlib.reload(american_binomial)
                 american_binomial.run()
             elif choice == "8":
-                import kiko_quasi_mc
                 importlib.reload(kiko_quasi_mc)
                 kiko_quasi_mc.run()
             elif choice == "0":
