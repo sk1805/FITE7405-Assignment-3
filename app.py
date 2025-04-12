@@ -97,7 +97,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Option Premium"),
-                    dbc.Input(id="iv-price", type="number", value=10, step=0.01),
+                    dbc.Input(id="iv-market-price", type="number", value=10, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -127,8 +127,8 @@ tabs = [
                     dbc.Input(id="ga-S", type="number", value=100, step=0.01),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="ga-K", type="number", value=100, step=0.01),
+                    dbc.Label("Volatility (σ)"),
+                    dbc.Input(id="ga-sigma", type="number", value=0.2, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -143,8 +143,8 @@ tabs = [
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="ga-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Label("Strike Price (K)"),
+                    dbc.Input(id="ga-K", type="number", value=100, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Observations (n)"),
@@ -178,8 +178,8 @@ tabs = [
                     dbc.Input(id="aa-S", type="number", value=100, step=0.01),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="aa-K", type="number", value=100, step=0.01),
+                    dbc.Label("Volatility (σ)"),
+                    dbc.Input(id="aa-sigma", type="number", value=0.2, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -194,29 +194,12 @@ tabs = [
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="aa-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Label("Strike Price (K)"),
+                    dbc.Input(id="aa-K", type="number", value=100, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Observations (n)"),
                     dbc.Input(id="aa-n", type="number", value=100, step=1),
-                ], width=6),
-            ]),
-            dbc.Row([
-                dbc.Col([
-                    dbc.Label("Number of Paths (N)"),
-                    dbc.Input(id="aa-N", type="number", value=10000, step=1000),
-                ], width=6),
-                dbc.Col([
-                    dbc.Label("Control Variate Method"),
-                    dbc.Select(
-                        id="aa-control-variate",
-                        options=[
-                            {"label": "No Control Variate", "value": "none"},
-                            {"label": "Geometric Asian", "value": "geometric"}
-                        ],
-                        value="none"
-                    ),
                 ], width=6),
             ]),
             dbc.Row([
@@ -229,6 +212,23 @@ tabs = [
                             {"label": "Put", "value": "put"}
                         ],
                         value="call"
+                    ),
+                ], width=6),
+                dbc.Col([
+                    dbc.Label("Number of Simulations"),
+                    dbc.Input(id="aa-num-simulations", type="number", value=10000, step=1000),
+                ], width=6),
+            ]),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Label("Control Variate Method"),
+                    dbc.Select(
+                        id="aa-control-variate",
+                        options=[
+                            {"label": "No Control Variate", "value": "none"},
+                            {"label": "Geometric Asian", "value": "geometric"}
+                        ],
+                        value="none"
                     ),
                 ], width=6),
             ]),
@@ -252,28 +252,28 @@ tabs = [
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="gb-K", type="number", value=100, step=0.01),
+                    dbc.Label("Volatility 1 (σ1)"),
+                    dbc.Input(id="gb-sigma1", type="number", value=0.2, step=0.01),
                 ], width=6),
+                dbc.Col([
+                    dbc.Label("Volatility 2 (σ2)"),
+                    dbc.Input(id="gb-sigma2", type="number", value=0.2, step=0.01),
+                ], width=6),
+            ]),
+            dbc.Row([
                 dbc.Col([
                     dbc.Label("Risk-free Rate (r)"),
                     dbc.Input(id="gb-r", type="number", value=0.05, step=0.01),
                 ], width=6),
-            ]),
-            dbc.Row([
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
                     dbc.Input(id="gb-T", type="number", value=1.0, step=0.01),
                 ], width=6),
-                dbc.Col([
-                    dbc.Label("Volatility 1 (σ1)"),
-                    dbc.Input(id="gb-sigma1", type="number", value=0.2, step=0.01),
-                ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Volatility 2 (σ2)"),
-                    dbc.Input(id="gb-sigma2", type="number", value=0.2, step=0.01),
+                    dbc.Label("Strike Price (K)"),
+                    dbc.Input(id="gb-K", type="number", value=100, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Correlation (ρ)"),
@@ -313,49 +313,32 @@ tabs = [
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="ab-K", type="number", value=100, step=0.01),
-                ], width=6),
-                dbc.Col([
-                    dbc.Label("Risk-free Rate (r)"),
-                    dbc.Input(id="ab-r", type="number", value=0.05, step=0.01),
-                ], width=6),
-            ]),
-            dbc.Row([
-                dbc.Col([
-                    dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="ab-T", type="number", value=1.0, step=0.01),
-                ], width=6),
-                dbc.Col([
                     dbc.Label("Volatility 1 (σ1)"),
                     dbc.Input(id="ab-sigma1", type="number", value=0.2, step=0.01),
                 ], width=6),
-            ]),
-            dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility 2 (σ2)"),
                     dbc.Input(id="ab-sigma2", type="number", value=0.2, step=0.01),
                 ], width=6),
+            ]),
+            dbc.Row([
                 dbc.Col([
-                    dbc.Label("Correlation (ρ)"),
-                    dbc.Input(id="ab-rho", type="number", value=0.5, step=0.01),
+                    dbc.Label("Risk-free Rate (r)"),
+                    dbc.Input(id="ab-r", type="number", value=0.05, step=0.01),
+                ], width=6),
+                dbc.Col([
+                    dbc.Label("Time to Maturity (T)"),
+                    dbc.Input(id="ab-T", type="number", value=1.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Number of Paths (N)"),
-                    dbc.Input(id="ab-N", type="number", value=10000, step=1000),
+                    dbc.Label("Strike Price (K)"),
+                    dbc.Input(id="ab-K", type="number", value=100, step=0.01),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Control Variate Method"),
-                    dbc.Select(
-                        id="ab-control-variate",
-                        options=[
-                            {"label": "No Control Variate", "value": "none"},
-                            {"label": "Geometric Basket", "value": "geometric"}
-                        ],
-                        value="none"
-                    ),
+                    dbc.Label("Correlation (ρ)"),
+                    dbc.Input(id="ab-rho", type="number", value=0.5, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -368,6 +351,23 @@ tabs = [
                             {"label": "Put", "value": "put"}
                         ],
                         value="call"
+                    ),
+                ], width=6),
+                dbc.Col([
+                    dbc.Label("Number of Simulations"),
+                    dbc.Input(id="ab-num-simulations", type="number", value=10000, step=1000),
+                ], width=6),
+            ]),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Label("Control Variate Method"),
+                    dbc.Select(
+                        id="ab-control-variate",
+                        options=[
+                            {"label": "No Control Variate", "value": "none"},
+                            {"label": "Geometric Basket", "value": "geometric"}
+                        ],
+                        value="none"
                     ),
                 ], width=6),
             ]),
@@ -406,7 +406,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Steps (N)"),
-                    dbc.Input(id="am-n", type="number", value=100, step=1),
+                    dbc.Input(id="am-N", type="number", value=100, step=1),
                 ], width=6),
             ]),
             dbc.Row([
@@ -475,6 +475,17 @@ tabs = [
                     dbc.Label("Number of Observation Times (n)"),
                     dbc.Input(id="kiko-n", type="number", value=100, step=1),
                 ], width=6),
+                dbc.Col([
+                    dbc.Label("Calculate Delta"),
+                    dbc.Select(
+                        id="kiko-calculate-delta",
+                        options=[
+                            {"label": "Yes", "value": "yes"},
+                            {"label": "No", "value": "no"}
+                        ],
+                        value="yes"
+                    ),
+                ], width=6),
             ]),
             dbc.Button("Calculate", id="kiko-calculate", color="primary", className="mt-3"),
             html.Div(id="kiko-result")
@@ -526,15 +537,15 @@ def calculate_black_scholes(n_clicks, S, K, r, q, T, sigma, option_type):
         State("iv-r", "value"),
         State("iv-q", "value"),
         State("iv-T", "value"),
-        State("iv-price", "value"),
+        State("iv-market-price", "value"),
         State("iv-option-type", "value"),
     ],
 )
-def calculate_implied_volatility(n_clicks, S, K, r, q, T, price, option_type):
+def calculate_implied_volatility(n_clicks, S, K, r, q, T, market_price, option_type):
     if n_clicks is None:
         return ""
     try:
-        sigma = implied_volatility(S, K, r, q, T, price, option_type)
+        sigma = implied_volatility(S, K, r, q, T, market_price, option_type)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Implied Volatility: {sigma:.10f}")
@@ -550,19 +561,19 @@ def calculate_implied_volatility(n_clicks, S, K, r, q, T, price, option_type):
     [Input("ga-calculate", "n_clicks")],
     [
         State("ga-S", "value"),
-        State("ga-K", "value"),
+        State("ga-sigma", "value"),
         State("ga-r", "value"),
         State("ga-T", "value"),
-        State("ga-sigma", "value"),
+        State("ga-K", "value"),
         State("ga-n", "value"),
         State("ga-option-type", "value"),
     ],
 )
-def calculate_geometric_asian(n_clicks, S, K, r, T, sigma, n, option_type):
+def calculate_geometric_asian(n_clicks, S, sigma, r, T, K, n, option_type):
     if n_clicks is None:
         return ""
     try:
-        price = geometric_asian(S, K, r, T, sigma, n, option_type)
+        price = geometric_asian(S, sigma, r, T, K, n, option_type)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}")
@@ -578,21 +589,21 @@ def calculate_geometric_asian(n_clicks, S, K, r, T, sigma, n, option_type):
     [Input("aa-calculate", "n_clicks")],
     [
         State("aa-S", "value"),
-        State("aa-K", "value"),
+        State("aa-sigma", "value"),
         State("aa-r", "value"),
         State("aa-T", "value"),
-        State("aa-sigma", "value"),
+        State("aa-K", "value"),
         State("aa-n", "value"),
-        State("aa-N", "value"),
-        State("aa-control-variate", "value"),
         State("aa-option-type", "value"),
+        State("aa-num-simulations", "value"),
+        State("aa-control-variate", "value"),
     ],
 )
-def calculate_arithmetic_asian(n_clicks, S, K, r, T, sigma, n, N, control_variate, option_type):
+def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
     try:
-        price, stderr = arithmetic_asian_mc(S, K, r, T, sigma, n, N, control_variate, option_type)
+        price, stderr = arithmetic_asian_mc(S, sigma, r, T, K, n, option_type, num_simulations, control_variate)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}"),
@@ -611,20 +622,20 @@ def calculate_arithmetic_asian(n_clicks, S, K, r, T, sigma, n, N, control_variat
     [
         State("gb-S1", "value"),
         State("gb-S2", "value"),
-        State("gb-K", "value"),
-        State("gb-r", "value"),
-        State("gb-T", "value"),
         State("gb-sigma1", "value"),
         State("gb-sigma2", "value"),
+        State("gb-r", "value"),
+        State("gb-T", "value"),
+        State("gb-K", "value"),
         State("gb-rho", "value"),
         State("gb-option-type", "value"),
     ],
 )
-def calculate_geometric_basket(n_clicks, S1, S2, K, r, T, sigma1, sigma2, rho, option_type):
+def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     if n_clicks is None:
         return ""
     try:
-        price = geometric_basket(S1, S2, K, r, T, sigma1, sigma2, rho, option_type)
+        price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}")
@@ -641,22 +652,22 @@ def calculate_geometric_basket(n_clicks, S1, S2, K, r, T, sigma1, sigma2, rho, o
     [
         State("ab-S1", "value"),
         State("ab-S2", "value"),
-        State("ab-K", "value"),
-        State("ab-r", "value"),
-        State("ab-T", "value"),
         State("ab-sigma1", "value"),
         State("ab-sigma2", "value"),
+        State("ab-r", "value"),
+        State("ab-T", "value"),
+        State("ab-K", "value"),
         State("ab-rho", "value"),
-        State("ab-N", "value"),
-        State("ab-control-variate", "value"),
         State("ab-option-type", "value"),
+        State("ab-num-simulations", "value"),
+        State("ab-control-variate", "value"),
     ],
 )
-def calculate_arithmetic_basket(n_clicks, S1, S2, K, r, T, sigma1, sigma2, rho, N, control_variate, option_type):
+def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
     try:
-        price, stderr = arithmetic_basket_mc(S1, S2, K, r, T, sigma1, sigma2, rho, N, control_variate, option_type)
+        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}"),
@@ -678,15 +689,15 @@ def calculate_arithmetic_basket(n_clicks, S1, S2, K, r, T, sigma1, sigma2, rho, 
         State("am-r", "value"),
         State("am-T", "value"),
         State("am-sigma", "value"),
-        State("am-n", "value"),
+        State("am-N", "value"),
         State("am-option-type", "value"),
     ],
 )
-def calculate_american(n_clicks, S, K, r, T, sigma, n, option_type):
+def calculate_american(n_clicks, S, K, r, T, sigma, N, option_type):
     if n_clicks is None:
         return ""
     try:
-        price = american_binomial(S, K, r, T, sigma, n, option_type)
+        price = american_binomial(S, K, r, T, sigma, N, option_type)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}")
@@ -710,18 +721,20 @@ def calculate_american(n_clicks, S, K, r, T, sigma, n, option_type):
         State("kiko-U", "value"),
         State("kiko-R", "value"),
         State("kiko-n", "value"),
+        State("kiko-calculate-delta", "value"),
     ],
 )
-def calculate_kiko(n_clicks, S, K, r, T, sigma, L, U, R, n):
+def calculate_kiko(n_clicks, S, K, r, T, sigma, L, U, R, n, calculate_delta):
     if n_clicks is None:
         return ""
     try:
-        price, stderr = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n)
+        price, stderr, delta = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}"),
             html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]"),
+            html.P(f"Delta: {delta:.10f}")
         ])
     except Exception as e:
         return html.Div([

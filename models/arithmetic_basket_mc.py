@@ -1,7 +1,7 @@
 import numpy as np
 from models.geometric_basket import geometric_basket
 
-def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, num_simulations, control_variate):
+def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
     """
     Calculate the price of an arithmetic basket option using Monte Carlo simulation.
 
@@ -23,6 +23,8 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, num_simulations, 
         Strike price
     rho : float
         Correlation between the two assets
+    option_type : str
+        Option type ('call' or 'put')
     num_simulations : int
         Number of simulations for Monte Carlo
     control_variate : str
@@ -50,6 +52,8 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, num_simulations, 
         raise ValueError("Number of simulations must be positive.")
     if control_variate not in ['none', 'geometric']:
         raise ValueError("Control variate method must be either 'none' or 'geometric'.")
+    if option_type not in ['call', 'put']:
+        raise ValueError("Option type must be either 'call' or 'put'.")
 
     # Set fixed seed for reproducibility
     np.random.seed(42)
@@ -75,8 +79,10 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, num_simulations, 
         # Calculate payoffs based on option type
         if option_type == 'call':
             payoffs[i] = max(0, arithmetic_avg - K)
-        else:
+        elif option_type == 'put':
             payoffs[i] = max(0, K - arithmetic_avg)
+        else:
+            raise ValueError("Invalid option type. Must be 'call' or 'put'.")
 
     # If control variate is specified, adjust the payoffs
     if control_variate == 'geometric':
@@ -121,15 +127,15 @@ if __name__ == "__main__":
     try:
         S1 = float(input("Enter spot price of first asset: "))
         S2 = float(input("Enter spot price of second asset: "))
-        K = float(input("Enter strike price: "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
         sigma1 = float(input("Enter volatility of first asset (decimal): "))
         sigma2 = float(input("Enter volatility of second asset (decimal): "))
-        rho = float(input("Enter correlation between assets (decimal): "))
-        N = int(input("Enter number of simulation paths: "))
-        control_variate = input("Enter control variate method (none/geometric): ").lower()
-        option_type = input("Enter option type (call/put): ").lower()
+        r = float(input("Enter risk-free rate (decimal): "))
+        T = float(input("Enter time to maturity (years): "))
+        K = float(input("Enter strike price: "))
+        rho = float(input("Enter correlation (decimal): "))
+        option_type = input("Enter option type (call/put): ")
+        num_simulations = int(input("Enter number of simulations: "))
+        control_variate = input("Enter control variate method (none/geometric): ")
         
         if option_type not in ['call', 'put']:
             raise ValueError("Option type must be either 'call' or 'put'")
@@ -138,7 +144,7 @@ if __name__ == "__main__":
         if rho < -1 or rho > 1:
             raise ValueError("Correlation must be between -1 and 1")
         
-        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, N, control_variate)
+        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         print(f"\n{option_type.capitalize()} option price: {price:.10f}")
         print(f"Standard error: {stderr:.10f}")
         print(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
