@@ -71,7 +71,7 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type):
 
 if __name__ == "__main__":
     try:
-       S1 = float(input("Enter spot price of first asset: "))
+        S1 = float(input("Enter spot price of first asset: "))
         S2 = float(input("Enter spot price of second asset: "))
         sigma1 = float(input("Enter volatility of first asset (decimal): "))
         sigma2 = float(input("Enter volatility of second asset (decimal): "))
