@@ -1,7 +1,7 @@
 import numpy as np
 from models.geometric_basket import geometric_basket
 
-def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type, num_simulations, control_variate):
+def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
     """
     Calculate the price of an arithmetic basket option using Monte Carlo simulation.
 
@@ -23,8 +23,6 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type, n
         Strike price
     rho : float
         Correlation between the two assets
-    n : int
-        Number of observation times for the arithmetic average
     option_type : str
         Option type ('call' or 'put')
     num_simulations : int
@@ -56,79 +54,51 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type, n
         raise ValueError("Control variate method must be either 'none' or 'geometric'.")
     if option_type not in ['call', 'put']:
         raise ValueError("Option type must be either 'call' or 'put'.")
-    if n <= 1:
-        raise ValueError("Number of observations n must be greater than 1.")
 
-    # Time step for each observation (equally spaced)
-    dt = T / n
-
-    # Set fixed seed for reproducibility
+    # Set seed for reproducibility
     np.random.seed(42)
 
-    # Initialize arrays for storing payoffs
-    payoffs = np.zeros(num_simulations)
+    # Simulate correlated standard normals
+    Z1 = np.random.normal(0, 1, num_simulations)
+    Z2 = rho * Z1 + np.sqrt(1 - rho**2) * np.random.normal(0, 1, num_simulations)
 
-    for i in range(num_simulations):
-        # Simulate the stock price paths for both assets
-        S1_path = np.zeros(n)
-        S2_path = np.zeros(n)
-        for j in range(n):
-            Z1 = np.random.normal(0, 1)
-            Z2 = rho * Z1 + np.sqrt(1 - rho**2) * np.random.normal(0, 1)
-            S1_path[j] = S1 * np.exp((r - 0.5 * sigma1 ** 2) * (j + 1) * dt + sigma1 * np.sqrt((j + 1) * dt) * Z1)
-            S2_path[j] = S2 * np.exp((r - 0.5 * sigma2 ** 2) * (j + 1) * dt + sigma2 * np.sqrt((j + 1) * dt) * Z2)
+    # Simulate asset prices at maturity
+    S1_T = S1 * np.exp((r - 0.5 * sigma1**2) * T + sigma1 * np.sqrt(T) * Z1)
+    S2_T = S2 * np.exp((r - 0.5 * sigma2**2) * T + sigma2 * np.sqrt(T) * Z2)
 
-        # Calculate the arithmetic average
-        arithmetic_avg = np.mean(S1_path + S2_path)
+    # Arithmetic average basket
+    arithmetic_avg = 0.5 * (S1_T + S2_T)
 
-        # Calculate payoffs based on option type
-        if option_type == 'call':
-            payoffs[i] = max(0, arithmetic_avg - K)
-        elif option_type == 'put':
-            payoffs[i] = max(0, K - arithmetic_avg)
-        else:
-            raise ValueError("Invalid option type. Must be 'call' or 'put'.")
+    # Payoffs
+    if option_type == 'call':
+        payoffs = np.maximum(arithmetic_avg - K, 0)
+    else:
+        payoffs = np.maximum(K - arithmetic_avg, 0)
 
-    # Apply control variate adjustment if specified
+    # Control variate method using geometric basket
     if control_variate == 'geometric':
-        # Get geometric basket price using the geometric_basket function
-        geo_price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type)
-        
-        # Initialize arrays for storing the geometric basket payoffs
-        geo_payoffs = np.zeros(num_simulations)
+        # Geometric average
+        geo_avg = np.sqrt(S1_T * S2_T)
+        if option_type == 'call':
+            geo_payoffs = np.maximum(geo_avg - K, 0)
+        else:
+            geo_payoffs = np.maximum(K - geo_avg, 0)
 
-        for i in range(num_simulations):
-            # Simulate the stock price paths for both assets for geometric average
-            S1_path = np.zeros(n)
-            S2_path = np.zeros(n)
-            for j in range(n):
-                Z1 = np.random.normal(0, 1)
-                Z2 = rho * Z1 + np.sqrt(1 - rho**2) * np.random.normal(0, 1)
-                S1_path[j] = S1 * np.exp((r - 0.5 * sigma1 ** 2) * (j + 1) * dt + sigma1 * np.sqrt((j + 1) * dt) * Z1)
-                S2_path[j] = S2 * np.exp((r - 0.5 * sigma2 ** 2) * (j + 1) * dt + sigma2 * np.sqrt((j + 1) * dt) * Z2)
+        # Analytical price of geometric basket option
+        geo_price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
 
-            # Calculate the geometric average
-            geo_avg = np.sqrt(np.prod(S1_path) * np.prod(S2_path))  # Product of S1 and S2 for the geometric average
-
-            # Geometric payoffs based on option type
-            if option_type == 'call':
-                geo_payoffs[i] = max(0, geo_avg - K)
-            else:
-                geo_payoffs[i] = max(0, K - geo_avg)
-
-        # Calculate control variate coefficient (beta)
+        # Control variate adjustment
         cov = np.cov(payoffs, geo_payoffs)[0, 1]
         var_geo = np.var(geo_payoffs)
         beta = cov / var_geo
 
-        # Adjust payoffs using control variate
         adjusted_payoffs = payoffs - beta * (geo_payoffs - geo_price)
     else:
         adjusted_payoffs = payoffs
 
-    # Calculate option price and standard error
-    price = np.mean(adjusted_payoffs) * np.exp(-r * T)
-    stderr = np.std(adjusted_payoffs) * np.exp(-r * T) / np.sqrt(num_simulations)
+    # Discounted expected value and standard error
+    price = np.exp(-r * T) * np.mean(adjusted_payoffs)
+    stderr = np.exp(-r * T) * np.std(adjusted_payoffs) / np.sqrt(num_simulations)
 
     return price, stderr
 

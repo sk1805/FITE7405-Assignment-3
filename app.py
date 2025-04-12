@@ -282,10 +282,6 @@ tabs = [
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Number of Observations (n)"),
-                    dbc.Input(id="gb-n", type="number", value=100, step=1),
-                ], width=6),
-                dbc.Col([
                     dbc.Label("Option Type"),
                     dbc.Select(
                         id="gb-option-type",
@@ -347,10 +343,6 @@ tabs = [
             ]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Label("Number of Observations (n)"),
-                    dbc.Input(id="ab-n", type="number", value=100, step=1),
-                ], width=6),
-                dbc.Col([
                     dbc.Label("Option Type"),
                     dbc.Select(
                         id="ab-option-type",
@@ -361,12 +353,12 @@ tabs = [
                         value="call"
                     ),
                 ], width=6),
-            ]),
-            dbc.Row([
                 dbc.Col([
                     dbc.Label("Number of Simulations"),
                     dbc.Input(id="ab-num-simulations", type="number", value=10000, step=1000),
                 ], width=6),
+            ]),
+            dbc.Row([
                 dbc.Col([
                     dbc.Label("Control Variate Method"),
                     dbc.Select(
@@ -636,15 +628,14 @@ def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_
         State("gb-T", "value"),
         State("gb-K", "value"),
         State("gb-rho", "value"),
-        State("gb-n", "value"),
         State("gb-option-type", "value"),
     ],
 )
-def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type):
+def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     if n_clicks is None:
         return ""
     try:
-        price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type)
+        price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}")
@@ -667,17 +658,16 @@ def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, n
         State("ab-T", "value"),
         State("ab-K", "value"),
         State("ab-rho", "value"),
-        State("ab-n", "value"),
         State("ab-option-type", "value"),
         State("ab-num-simulations", "value"),
         State("ab-control-variate", "value"),
     ],
 )
-def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type, num_simulations, control_variate):
+def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
     try:
-        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type, num_simulations, control_variate)
+        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         return html.Div([
             html.H4("Results:"),
             html.P(f"Option Price: {price:.10f}"),

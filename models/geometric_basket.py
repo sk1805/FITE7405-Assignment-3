@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 
-def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type):
+def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     """
     Calculate the price of a geometric basket option.
 
@@ -23,8 +23,6 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type):
         Strike price
     rho : float
         Correlation between the two assets
-    n : int
-        Number of observation times for the geometric average
     option_type : str
         Type of option ('call' or 'put')
     """
@@ -39,32 +37,22 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, n, option_type):
         raise ValueError("Correlation rho must be between -1 and 1.")
     if K <= 0:
         raise ValueError("Strike price must be positive.")
-    if n <= 1:
-        raise ValueError("Number of observations n must be greater than 1.")
     if option_type not in ['call', 'put']:
         raise ValueError("Option type must be 'call' or 'put'.")
 
-    # Time step for each observation (equally spaced)
-    dt = T / n
+    # Geometric average spot price and effective volatility
+    B0 = np.sqrt(S1 * S2)
+    sigma_B = np.sqrt((sigma1 ** 2 + sigma2 ** 2 + 2 * rho * sigma1 * sigma2)) / 2
 
-    # Simulate paths for both assets and calculate the geometric average
-    S1_path = np.zeros(n)
-    S2_path = np.zeros(n)
-    for i in range(n):
-        # Calculate the price at each observation time
-        Z1 = np.random.normal(0, 1)
-        Z2 = rho * Z1 + np.sqrt(1 - rho**2) * np.random.normal(0, 1)
-        S1_path[i] = S1 * np.exp((r - 0.5 * sigma1 ** 2) * (i + 1) * dt + sigma1 * np.sqrt((i + 1) * dt) * Z1)
-        S2_path[i] = S2 * np.exp((r - 0.5 * sigma2 ** 2) * (i + 1) * dt + sigma2 * np.sqrt((i + 1) * dt) * Z2)
+    # Black-Scholes d1 and d2
+    d1 = (np.log(B0 / K) + (r + 0.5 * sigma_B ** 2) * T) / (sigma_B * np.sqrt(T))
+    d2 = d1 - sigma_B * np.sqrt(T)
 
-    # Calculate the geometric average at maturity
-    geo_avg = np.exp(np.sum(np.log(S1_path) + np.log(S2_path)) / (2 * n))
-
-    # Calculate option price based on option type
+    # Option price
     if option_type == 'call':
-        price = np.exp(-r * T) * max(0, geo_avg - K)
-    else:  # 'put'
-        price = np.exp(-r * T) * max(0, K - geo_avg)
+        price = np.exp(-r * T) * (B0 * np.exp(r * T) * norm.cdf(d1) - K * norm.cdf(d2))
+    else:
+        price = np.exp(-r * T) * (K * norm.cdf(-d2) - B0 * np.exp(r * T) * norm.cdf(-d1))
 
     return price
 
