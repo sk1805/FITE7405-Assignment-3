@@ -1,8 +1,46 @@
 import numpy as np
 from scipy.stats import norm
 from scipy.stats import qmc
+from typing import Dict, Tuple, Union
 
-def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
+# Set fixed seed for reproducibility at module level
+np.random.seed(5)
+
+def simulate_paths(S: float, r: float, sigma: float, T: float, n: int, M: int, Z: np.ndarray) -> np.ndarray:
+    """Simulate stock price paths using quasi-Monte Carlo."""
+    dt = T/n
+    drift = (r - 0.5*sigma**2)*dt
+    vol = sigma*np.sqrt(dt)
+    
+    paths = np.zeros((M, n+1))
+    paths[:, 0] = S
+    
+    for i in range(n):
+        paths[:, i+1] = paths[:, i] * np.exp(drift + vol*Z[:, i])
+    
+    return paths
+
+def calculate_payoffs(paths: np.ndarray, K: float, L: float, U: float, R: float, r: float, T: float, n: int) -> np.ndarray:
+    """Calculate payoffs for KIKO put option."""
+    dt = T/n
+    M = paths.shape[0]
+    payoffs = np.zeros(M)
+    
+    # Check for knock-in and knock-out conditions with small epsilon for numerical stability
+    eps = 1e-8
+    knock_in = np.any(paths <= L + eps, axis=1)
+    knock_out = np.any(paths >= U - eps, axis=1)
+    
+    # Payoff for paths that knock out
+    payoffs[knock_out] = R
+    
+    # Payoff for paths that knock in but don't knock out
+    active_paths = ~knock_out & knock_in
+    payoffs[active_paths] = np.maximum(K - paths[active_paths, -1], 0)
+    
+    return payoffs
+
+def kiko_quasi_mc(S: float, K: float, r: float, T: float, sigma: float, L: float, U: float, R: float, n: int, calculate_delta: bool = False) -> Union[Tuple[float, float, Tuple[float, float]], Tuple[float, float, Tuple[float, float], float]]:
     """
     Calculate the price of a KIKO (Knock-In Knock-Out) put option using quasi-Monte Carlo simulation.
     
@@ -32,12 +70,9 @@ def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
     Returns:
     --------
     tuple
-        (Option price, Standard error, Delta) if calculate_delta is True
-        (Option price, Standard error) otherwise
+        (Option price, Standard error, Confidence interval, Delta) if calculate_delta is True
+        (Option price, Standard error, Confidence interval) otherwise
     """
-    # Set fixed seed for reproducibility
-    np.random.seed(5)
-    
     # Validate input parameters
     if S <= 0:
         raise ValueError("Spot price S must be positive.")
@@ -55,51 +90,48 @@ def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
         raise ValueError("Cash rebate R must be non-negative.")
     if n <= 0:
         raise ValueError("Number of observation times n must be positive.")
+
+    M = 100000  # Number of simulation paths
     
-    dt = T/n
-    drift = (r - 0.5*sigma**2)*dt
-    vol = sigma*np.sqrt(dt)
-    
-    # Generate quasi-random numbers using Sobol sequence
-    sobol = qmc.Sobol(n, scramble=True)
-    Z = norm.ppf(sobol.random(100000))  # Using 100,000 paths
+    # Generate quasi-random numbers using Sobol sequence with scrambling
+    sobol = qmc.Sobol(n, scramble=True, seed=5)
+    Z = norm.ppf(sobol.random(M))
     
     # Simulate stock paths
-    S_paths = np.zeros((100000, n+1))
-    S_paths[:, 0] = S
-    
-    for i in range(n):
-        S_paths[:, i+1] = S_paths[:, i] * np.exp(drift + vol*Z[:, i])
-    
-    # Check for knock-in and knock-out conditions
-    eps = 1e-8
-    knock_in = np.any(S_paths <= L + eps, axis=1)
-    knock_out = np.any(S_paths >= U - eps, axis=1)
+    paths = simulate_paths(S, r, sigma, T, n, M, Z)
     
     # Calculate payoffs
-    payoffs = np.zeros(100000)
-    
-    # Payoff for paths that knock out
-    payoffs[knock_out] = R
-    
-    # Payoff for paths that knock in but don't knock out
-    active_paths = ~knock_out & knock_in
-    payoffs[active_paths] = np.maximum(K - S_paths[active_paths, -1], 0)
+    payoffs = calculate_payoffs(paths, K, L, U, R, r, T, n)
     
     # Calculate option price and standard error
     price = np.exp(-r*T) * np.mean(payoffs)
-    stderr = np.exp(-r*T) * np.std(payoffs) / np.sqrt(10000)
+    stderr = np.exp(-r*T) * np.std(payoffs) / np.sqrt(M)
+    
+    # Calculate 95% confidence interval
+    conf_interval = (price - 1.96 * stderr, price + 1.96 * stderr)
     
     if not calculate_delta:
-        return price, stderr
+        return price, stderr, conf_interval
     
     # Calculate Delta using finite difference method
     h = S * 0.01  # 1% of spot price
-    price_up, _ = kiko_quasi_mc(S + h, K, r, T, sigma, L, U, R, n)
-    price_down, _ = kiko_quasi_mc(S - h, K, r, T, sigma, L, U, R, n)
+    
+    # Use new Sobol sequences for up and down prices with different seeds
+    sobol_up = qmc.Sobol(n, scramble=True, seed=6)
+    Z_up = norm.ppf(sobol_up.random(M))
+    paths_up = simulate_paths(S + h, r, sigma, T, n, M, Z_up)
+    payoffs_up = calculate_payoffs(paths_up, K, L, U, R, r, T, n)
+    price_up = np.exp(-r*T) * np.mean(payoffs_up)
+    
+    sobol_down = qmc.Sobol(n, scramble=True, seed=7)
+    Z_down = norm.ppf(sobol_down.random(M))
+    paths_down = simulate_paths(S - h, r, sigma, T, n, M, Z_down)
+    payoffs_down = calculate_payoffs(paths_down, K, L, U, R, r, T, n)
+    price_down = np.exp(-r*T) * np.mean(payoffs_down)
+    
     delta = (price_up - price_down) / (2 * h)
     
-    return price, stderr, delta
+    return price, stderr, conf_interval, delta
 
 if __name__ == "__main__":
     try:
@@ -112,17 +144,17 @@ if __name__ == "__main__":
         U = float(input("Enter upper barrier: "))
         R = float(input("Enter cash rebate: "))
         n = int(input("Enter number of observation times: "))
-        # calculate_delta = input("Calculate Delta? (y/n): ").lower() == 'y'
         if L >= U:
             raise ValueError("Lower barrier must be less than upper barrier")
         if R < 0:
             raise ValueError("Cash rebate must be non-negative")
         
-        price, stderr, delta = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=True)
+        result = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=True)
+        price, stderr, conf_interval, delta = result
         print(f"\nOption price: {price:.10f}")
         print(f"Standard error: {stderr:.10f}")
+        print(f"95% Confidence Interval: [{conf_interval[0]:.10f}, {conf_interval[1]:.10f}]")
         print(f"Delta: {delta:.10f}")
-        print(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
         
     except ValueError as e:
         print(f"Error: {str(e)}")
