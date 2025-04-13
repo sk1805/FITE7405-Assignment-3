@@ -40,8 +40,8 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_
         raise ValueError("Volatility sigma1 must be positive.")
     if sigma2 <= 0:
         raise ValueError("Volatility sigma2 must be positive.")
-    if r < 0:
-        raise ValueError("Risk-free rate r must be non-negative.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
     if T <= 0:
         raise ValueError("Time to maturity T must be positive.")
     if K <= 0:

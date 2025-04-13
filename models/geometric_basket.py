@@ -37,6 +37,10 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
         raise ValueError("Correlation rho must be between -1 and 1.")
     if K <= 0:
         raise ValueError("Strike price must be positive.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
+    if rho < -1 or rho > 1:
+        raise ValueError("Correlation rho must be between -1 and 1.")
     if option_type not in ['call', 'put']:
         raise ValueError("Option type must be 'call' or 'put'.")
 

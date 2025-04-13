@@ -45,8 +45,8 @@ def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
         raise ValueError("Strike price K must be positive.")
     if sigma <= 0:
         raise ValueError("Volatility sigma must be positive.")
-    if r < 0:
-        raise ValueError("Risk-free rate r must be non-negative.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
     if T <= 0:
         raise ValueError("Time to maturity T must be positive.")
     if L >= U:

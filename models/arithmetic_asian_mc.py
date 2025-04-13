@@ -39,8 +39,8 @@ def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, con
         raise ValueError("Strike price K must be positive.")
     if sigma <= 0:
         raise ValueError("Volatility sigma must be positive.")
-    if r < 0:
-        raise ValueError("Risk-free rate r must be non-negative.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
     if T <= 0:
         raise ValueError("Time to maturity T must be positive.")
     if n <= 0:
@@ -72,6 +72,7 @@ def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, con
     # Calculate arithmetic and geometric averages
     arithmetic_avg = np.mean(S_paths[:, 1:], axis=1)
     geometric_avg = np.exp(np.mean(np.log(S_paths[:, 1:]), axis=1))
+    
     # Calculate payoffs
     if option_type == 'call':
         arithmetic_payoffs = np.maximum(arithmetic_avg - K, 0)
@@ -81,7 +82,6 @@ def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, con
         geometric_payoffs = np.maximum(K - geometric_avg, 0)
     else:
         raise ValueError("Invalid option_type. Must be 'call' or 'put'.")
-
     
     # If control variate is specified, adjust the payoffs
     if control_variate == 'geometric':
@@ -104,6 +104,68 @@ def arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, con
     
     return price, stderr
 
+def geometric_asian_exact(S0, sigma, r, T, K, n, option_type):
+    """
+    Calculate the exact price of a geometric Asian option.
+    
+    Parameters:
+    -----------
+    S0 : float
+        Spot price of the underlying asset (S(0))
+    sigma : float
+        Volatility of the underlying asset
+    r : float
+        Risk-free interest rate
+    T : float
+        Time to maturity in years
+    K : float
+        Strike price
+    n : int
+        Number of observation times for the geometric average
+    option_type : str
+        Type of option ('call' or 'put')
+    
+    Returns:
+    --------
+    float
+        Exact price of the geometric Asian option
+    """
+    # Validate input parameters
+    if S0 <= 0:
+        raise ValueError("Spot price S(0) must be positive.")
+    if K <= 0:
+        raise ValueError("Strike price K must be positive.")
+    if sigma <= 0:
+        raise ValueError("Volatility sigma must be positive.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
+    if T <= 0:
+        raise ValueError("Time to maturity T must be positive.")
+    if n <= 0:
+        raise ValueError("Number of observation times n must be positive.")
+    if option_type not in ['call', 'put']:
+        raise ValueError("Option type must be either 'call' or 'put'.")
+    
+    # Calculate parameters for the geometric Asian option
+    sigsqT = sigma**2 * T * (n + 1) * (2 * n + 1) / (6 * n**2)
+    muT = 0.5 * sigsqT + (r - 0.5 * sigma**2) * T * (n + 1) / (2 * n)
+    
+    # Calculate d1 and d2
+    d1 = (np.log(S0 / K) + (muT + 0.5 * sigsqT)) / np.sqrt(sigsqT)
+    d2 = d1 - np.sqrt(sigsqT)
+    
+    # Calculate option price
+    if option_type == 'call':
+        N1 = norm.cdf(d1)
+        N2 = norm.cdf(d2)
+        price = np.exp(-r * T) * (S0 * np.exp(muT) * N1 - K * N2)
+    elif option_type == 'put':
+        N1 = norm.cdf(-d1)
+        N2 = norm.cdf(-d2)
+        price = np.exp(-r * T) * (K * N2 - S0 * np.exp(muT) * N1)
+    
+    return price
+
 if __name__ == "__main__":
     try:
         S0 = float(input("Enter spot price: "))
@@ -116,10 +178,16 @@ if __name__ == "__main__":
         num_simulations = int(input("Enter number of simulations: "))
         control_variate = input("Enter control variate method (none/geometric): ")
         
+        # Calculate arithmetic Asian option price
         price, stderr = arithmetic_asian_mc(S0, sigma, r, T, K, n, option_type, num_simulations, control_variate)
-        print(f"\nOption price: {price:.10f}")
-        print(f"Standard error: {stderr:.10f}")
+        
+        # Calculate geometric Asian option price (exact)
+        geo_price = geometric_asian_exact(S0, sigma, r, T, K, n, option_type)
+        
+        print(f"\nArithmetic Asian Option Price: {price:.10f}")
+        print(f"Standard Error: {stderr:.10f}")
         print(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+        print(f"Geometric Asian Option Price (Exact): {geo_price:.10f}")
         
     except ValueError as e:
         print(f"Error: {str(e)}")

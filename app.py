@@ -215,7 +215,7 @@ tabs = [
                     ),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Number of Simulations"),
+                    dbc.Label("Number of Simulations (m)"),
                     dbc.Input(id="aa-num-simulations", type="number", value=10000, step=1000),
                 ], width=6),
             ]),
@@ -354,7 +354,7 @@ tabs = [
                     ),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Number of Simulations"),
+                    dbc.Label("Number of Simulations (m)"),
                     dbc.Input(id="ab-num-simulations", type="number", value=10000, step=1000),
                 ], width=6),
             ]),
@@ -516,17 +516,18 @@ app.layout = dbc.Container([
 def calculate_black_scholes(n_clicks, S, K, r, q, T, sigma, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = black_scholes(S, K, r, q, T, sigma, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("iv-result", "children"),
@@ -544,17 +545,18 @@ def calculate_black_scholes(n_clicks, S, K, r, q, T, sigma, option_type):
 def calculate_implied_volatility(n_clicks, S, K, r, q, T, market_price, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        sigma = implied_volatility(S, K, r, q, T, market_price, option_type)
+        implied_vol = implied_volatility(S, K, r, q, T, market_price, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Implied Volatility: {sigma:.10f}")
+            html.H5(f"Implied Volatility: {implied_vol:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("ga-result", "children"),
@@ -572,17 +574,18 @@ def calculate_implied_volatility(n_clicks, S, K, r, q, T, market_price, option_t
 def calculate_geometric_asian(n_clicks, S, sigma, r, T, K, n, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = geometric_asian(S, sigma, r, T, K, n, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("aa-result", "children"),
@@ -602,19 +605,18 @@ def calculate_geometric_asian(n_clicks, S, sigma, r, T, K, n, option_type):
 def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        price, stderr = arithmetic_asian_mc(S, sigma, r, T, K, n, option_type, num_simulations, control_variate)
+        price = arithmetic_asian_mc(S, sigma, r, T, K, n, option_type, num_simulations, control_variate)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}"),
-            html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("gb-result", "children"),
@@ -634,17 +636,18 @@ def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_
 def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("ab-result", "children"),
@@ -666,19 +669,18 @@ def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, o
 def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
+        price = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}"),
-            html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("am-result", "children"),
@@ -696,17 +698,18 @@ def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, 
 def calculate_american(n_clicks, S, K, r, T, sigma, N, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = american_binomial(S, K, r, T, sigma, N, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("kiko-result", "children"),
@@ -727,20 +730,26 @@ def calculate_american(n_clicks, S, K, r, T, sigma, N, option_type):
 def calculate_kiko(n_clicks, S, K, r, T, sigma, L, U, R, n, calculate_delta):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        price, stderr, delta = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
-        return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}"),
-            html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]"),
-            html.P(f"Delta: {delta:.10f}")
-        ])
+        result = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
+        if calculate_delta:
+            price, delta = result
+            return html.Div([
+                html.H5(f"Option Price: {price:.6f}"),
+                html.H5(f"Delta: {delta:.6f}"),
+            ])
+        else:
+            price = result
+            return html.Div([
+                html.H5(f"Option Price: {price:.6f}"),
+            ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 if __name__ == "__main__":
     app.run_server(debug=True) 
