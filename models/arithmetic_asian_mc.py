@@ -1,5 +1,4 @@
 import numpy as np
-from models.geometric_asian import geometric_asian
 from scipy.stats import norm
 from typing import Tuple, Dict
 
@@ -240,12 +239,13 @@ if __name__ == "__main__":
             # Calculate geometric Asian option price (exact)
             geo_price = geometric_asian_exact(S0, sigma, r, T, K, n, option_type)
             
-            print(f"\nResults for S={S0}, sigma={sigma}, K={K}, n={n}, option_type={option_type}:")
+            print(f"\nResults for S={S0}, sigma={sigma}, K={K}, n={n}, option_type={option_type}, control_variate=geometric:")
             print(f"Arithmetic Asian Option Price: {price:.6f}")
             print(f"Standard Error: {stderr:.6f}")
             print(f"95% Confidence Interval: [{price-1.96*stderr:.6f}, {price+1.96*stderr:.6f}]")
             print(f"Geometric Asian Option Price (Exact): {geo_price:.6f}")
-        
+            print("--------------------------------")
+            
     except ValueError as e:
         print(f"Error: {str(e)}")
     except Exception as e:

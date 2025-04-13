@@ -1,5 +1,5 @@
 import numpy as np
-from models.geometric_basket import geometric_basket
+from geometric_basket import geometric_basket
 from typing import Tuple, List
 
 def arithmetic_basket_mc(S1: float, S2: float, sigma1: float, sigma2: float, r: float, T: float, K: float, rho: float, 
@@ -118,29 +118,32 @@ def arithmetic_basket_mc(S1: float, S2: float, sigma1: float, sigma2: float, r: 
 
 if __name__ == "__main__":
     try:
-        S1 = float(input("Enter spot price of first asset: "))
-        S2 = float(input("Enter spot price of second asset: "))
-        sigma1 = float(input("Enter volatility of first asset (decimal): "))
-        sigma2 = float(input("Enter volatility of second asset (decimal): "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        K = float(input("Enter strike price: "))
-        rho = float(input("Enter correlation (decimal): "))
-        option_type = input("Enter option type (call/put): ")
-        num_simulations = int(input("Enter number of simulations: "))
-        control_variate = input("Enter control variate method (none/geometric): ")
-        
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        if control_variate not in ['none', 'geometric']:
-            raise ValueError("Control variate method must be either 'none' or 'geometric'")
-        if rho < -1 or rho > 1:
-            raise ValueError("Correlation must be between -1 and 1")
-        
-        price, stderr, conf_interval = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
-        print(f"\n{option_type.capitalize()} option price: {price:.10f}")
-        print(f"Standard error: {stderr:.10f}")
-        print(f"95% Confidence Interval: [{conf_interval[0]:.10f}, {conf_interval[1]:.10f}]")
+        test_cases = [
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.5, "put", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.9, "put", 100000, "geometric"),
+            (100, 100, 0.1, 0.3, 0.05, 3, 100, 0.5, "put", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 80, 0.5, "put", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 120, 0.5, "put", 100000, "geometric"),
+            (100, 100, 0.5, 0.5, 0.05, 3, 100, 0.5, "put", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.5, "call", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.9, "call", 100000, "geometric"),
+            (100, 100, 0.1, 0.3, 0.05, 3, 100, 0.5, "call", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 80, 0.5, "call", 100000, "geometric"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 120, 0.5, "call", 100000, "geometric"),
+            (100, 100, 0.5, 0.5, 0.05, 3, 100, 0.5, "call", 100000, "geometric")
+
+        ]
+
+        print("\nRunning test cases...")
+        for S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate in test_cases:
+            price, stderr, conf_interval = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
+            geo_price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
+            print(f"\nResults for S1: {S1}, S2: {S2}, sigma1: {sigma1}, sigma2: {sigma2}, r: {r}, T: {T}, K: {K}, rho: {rho}, option_type: {option_type}, num_simulations: {num_simulations}, control_variate: {control_variate}")
+            print(f"Arithmetic Basket Option price: {price:.10f}")
+            print(f"Standard error: {stderr:.10f}")
+            print(f"95% Confidence Interval: [{conf_interval[0]:.10f}, {conf_interval[1]:.10f}]")
+            print(f"Geometric Basket Option price: {geo_price:.10f}")
+            print("--------------------------------")
         
     except ValueError as e:
         print(f"Error: {str(e)}")

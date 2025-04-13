@@ -65,23 +65,27 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
 
 if __name__ == "__main__":
     try:
-        S1 = float(input("Enter spot price of first asset: "))
-        S2 = float(input("Enter spot price of second asset: "))
-        sigma1 = float(input("Enter volatility of first asset (decimal): "))
-        sigma2 = float(input("Enter volatility of second asset (decimal): "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        K = float(input("Enter strike price: "))
-        rho = float(input("Enter correlation (decimal): "))
-        option_type = input("Enter option type (call/put): ")
-            
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        if rho < -1 or rho > 1:
-            raise ValueError("Correlation must be between -1 and 1")
+        test_cases = [
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.5, "put"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.9, "put"),
+            (100, 100, 0.1, 0.3, 0.05, 3, 100, 0.5, "put"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 80, 0.5, "put"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 120, 0.5, "put"),
+            (100, 100, 0.5, 0.5, 0.05, 3, 100, 0.5, "put"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.5, "call"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 100, 0.9, "call"),
+            (100, 100, 0.1, 0.3, 0.05, 3, 100, 0.5, "call"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 80, 0.5, "call"),
+            (100, 100, 0.3, 0.3, 0.05, 3, 120, 0.5, "call"),
+            (100, 100, 0.5, 0.5, 0.05, 3, 100, 0.5, "call")
+        ]
         
-        price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
-        print(f"\n{option_type.capitalize()} option price: {price:.10f}")
+        print("\nRunning test cases...")
+        for S1, S2, sigma1, sigma2, r, T, K, rho, option_type in test_cases:
+            price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
+            print(f"\nResults for S1: {S1}, S2: {S2}, sigma1: {sigma1}, sigma2: {sigma2}, r: {r}, T: {T}, K: {K}, rho: {rho}, option_type: {option_type}")
+            print(f"Geometric Basket Option price: {price:.10f}")
+            print("--------------------------------")
         
     except ValueError as e:
         print(f"Error: {str(e)}")

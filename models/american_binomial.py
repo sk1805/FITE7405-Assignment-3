@@ -26,8 +26,8 @@ def american_binomial(S, K, r, T, sigma, N, option_type):
         raise ValueError("Spot price S must be positive.")
     if K <= 0:
         raise ValueError("Strike price K must be positive.")
-    if r < 0:
-        raise ValueError("Risk-free rate r must be non-negative.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
     if T <= 0:
         raise ValueError("Time to maturity T must be positive.")
     if sigma <= 0:
@@ -67,19 +67,19 @@ def american_binomial(S, K, r, T, sigma, N, option_type):
 
 if __name__ == "__main__":
     try:
-        S = float(input("Enter spot price: "))
-        K = float(input("Enter strike price: "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        sigma = float(input("Enter volatility (decimal): "))
-        N = int(input("Enter number of steps: "))
-        option_type = input("Enter option type (call/put): ")
+
+        test_cases = [
+            (50, 40, 0.1, 2, 0.4, 200, "put"),
+            (50, 50, 0.1, 2, 0.4, 200, "put"),
+            (50, 70, 0.1, 2, 0.4, 200, "put"),
+        ]
         
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        
-        price = american_binomial(S, K, r, T, sigma, N, option_type)
-        print(f"\n{option_type.capitalize()} option price: {price:.10f}")
+        print("\nRunning test cases...")
+        for S, K, r, T, sigma, N, option_type in test_cases:
+            price = american_binomial(S, K, r, T, sigma, N, option_type)
+            print(f"Results for S: {S}, K: {K}, r: {r}, T: {T}, sigma: {sigma}, N: {N}, option_type: {option_type}")
+            print(f"American Binomial Option price: {price:.10f}")
+            print("--------------------------------")
         
     except ValueError as e:
         print(f"Error: {str(e)}")
