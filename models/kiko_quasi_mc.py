@@ -135,26 +135,20 @@ def kiko_quasi_mc(S: float, K: float, r: float, T: float, sigma: float, L: float
 
 if __name__ == "__main__":
     try:
-        S = float(input("Enter spot price: "))
-        K = float(input("Enter strike price: "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        sigma = float(input("Enter volatility (decimal): "))
-        L = float(input("Enter lower barrier: "))
-        U = float(input("Enter upper barrier: "))
-        R = float(input("Enter cash rebate: "))
-        n = int(input("Enter number of observation times: "))
-        if L >= U:
-            raise ValueError("Lower barrier must be less than upper barrier")
-        if R < 0:
-            raise ValueError("Cash rebate must be non-negative")
+        test_cases = [
+            (100, 100, 0.05, 2, 0.2, 80, 125, 1.5, 24, True),
+            (100, 100, 0.03, 2, 0.2, 75, 105, 5, 24, True),
+        ]
         
-        result = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=True)
-        price, stderr, conf_interval, delta = result
-        print(f"\nOption price: {price:.10f}")
-        print(f"Standard error: {stderr:.10f}")
-        print(f"95% Confidence Interval: [{conf_interval[0]:.10f}, {conf_interval[1]:.10f}]")
-        print(f"Delta: {delta:.10f}")
+        for S, K, r, T, sigma, L, U, R, n, calculate_delta in test_cases:
+            price, stderr, conf_interval, delta = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
+            print(f"\nResults for S: {S}, K: {K}, r: {r}, T: {T}, sigma: {sigma}, L: {L}, U: {U}, R: {R}, n: {n}, calculate_delta: {calculate_delta}")
+            print(f"KIKO Option price: {price:.10f}")
+            print(f"Standard error: {stderr:.10f}")
+            print(f"95% Confidence Interval: [{conf_interval[0]:.10f}, {conf_interval[1]:.10f}]")
+            print(f"Delta: {delta:.10f}")
+            print("--------------------------------")
+
         
     except ValueError as e:
         print(f"Error: {str(e)}")
