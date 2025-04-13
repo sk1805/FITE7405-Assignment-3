@@ -37,6 +37,10 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
         raise ValueError("Correlation rho must be between -1 and 1.")
     if K <= 0:
         raise ValueError("Strike price must be positive.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
+    if rho < -1 or rho > 1:
+        raise ValueError("Correlation rho must be between -1 and 1.")
     if option_type not in ['call', 'put']:
         raise ValueError("Option type must be 'call' or 'put'.")
 
@@ -44,15 +48,17 @@ def geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     B0 = np.sqrt(S1 * S2)
     sigma_B = np.sqrt((sigma1 ** 2 + sigma2 ** 2 + 2 * rho * sigma1 * sigma2)) / 2
 
+    mu = r - 0.25*(sigma1**2 + sigma2**2) + 0.5*sigma_B**2
+    
     # Black-Scholes d1 and d2
-    d1 = (np.log(B0 / K) + (r + 0.5 * sigma_B ** 2) * T) / (sigma_B * np.sqrt(T))
+    d1 = (np.log(B0 / K) + (mu + 0.5 * sigma_B ** 2) * T) / (sigma_B * np.sqrt(T))
     d2 = d1 - sigma_B * np.sqrt(T)
 
     # Option price
     if option_type == 'call':
-        price = np.exp(-r * T) * (B0 * np.exp(r * T) * norm.cdf(d1) - K * norm.cdf(d2))
+        price = np.exp(-r * T) * (B0 * np.exp(mu * T) * norm.cdf(d1) - K * norm.cdf(d2))
     else:
-        price = np.exp(-r * T) * (K * norm.cdf(-d2) - B0 * np.exp(r * T) * norm.cdf(-d1))
+        price = np.exp(-r * T) * (K * norm.cdf(-d2) - B0 * np.exp(mu * T) * norm.cdf(-d1))
 
     return price
 

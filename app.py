@@ -128,7 +128,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="ga-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="ga-sigma", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -138,7 +138,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="ga-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="ga-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -148,7 +148,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Observations (n)"),
-                    dbc.Input(id="ga-n", type="number", value=100, step=1),
+                    dbc.Input(id="ga-n", type="number", value=50, step=1),
                 ], width=6),
             ]),
             dbc.Row([
@@ -179,7 +179,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="aa-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="aa-sigma", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -189,7 +189,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="aa-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="aa-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -199,7 +199,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Observations (n)"),
-                    dbc.Input(id="aa-n", type="number", value=100, step=1),
+                    dbc.Input(id="aa-n", type="number", value=50, step=1),
                 ], width=6),
             ]),
             dbc.Row([
@@ -215,8 +215,8 @@ tabs = [
                     ),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Number of Simulations"),
-                    dbc.Input(id="aa-num-simulations", type="number", value=10000, step=1000),
+                    dbc.Label("Number of Simulations (m)"),
+                    dbc.Input(id="aa-num-simulations", type="number", value=100000, step=1000),
                 ], width=6),
             ]),
             dbc.Row([
@@ -253,11 +253,11 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility 1 (σ1)"),
-                    dbc.Input(id="gb-sigma1", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="gb-sigma1", type="number", value=0.3, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility 2 (σ2)"),
-                    dbc.Input(id="gb-sigma2", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="gb-sigma2", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -267,7 +267,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="gb-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="gb-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -314,11 +314,11 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility 1 (σ1)"),
-                    dbc.Input(id="ab-sigma1", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="ab-sigma1", type="number", value=0.3, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility 2 (σ2)"),
-                    dbc.Input(id="ab-sigma2", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="ab-sigma2", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -328,7 +328,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="ab-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="ab-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -354,8 +354,8 @@ tabs = [
                     ),
                 ], width=6),
                 dbc.Col([
-                    dbc.Label("Number of Simulations"),
-                    dbc.Input(id="ab-num-simulations", type="number", value=10000, step=1000),
+                    dbc.Label("Number of Simulations (m)"),
+                    dbc.Input(id="ab-num-simulations", type="number", value=100000, step=1000),
                 ], width=6),
             ]),
             dbc.Row([
@@ -381,49 +381,49 @@ tabs = [
         html.Div([
             dbc.Row([
                 dbc.Col([
+                    dbc.Label("Option Type"),
+                    dcc.Dropdown(
+                        id='american-option-type',
+                        options=[
+                            {'label': 'Put', 'value': 'put'},
+                            {'label': 'Call', 'value': 'call'}
+                        ],
+                        value='put'
+                    )
+                ], width=12)
+            ]),
+            dbc.Row([
+                dbc.Col([
                     dbc.Label("Spot Price (S(0))"),
-                    dbc.Input(id="am-S", type="number", value=100, step=0.01),
+                    dbc.Input(id="american-S", type="number", value=50)
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="am-K", type="number", value=100, step=0.01),
-                ], width=6),
+                    dbc.Input(id="american-K", type="number", value=40)
+                ], width=6)
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Risk-free Rate (r)"),
-                    dbc.Input(id="am-r", type="number", value=0.05, step=0.01),
+                    dbc.Input(id="american-r", type="number", value=0.1)
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="am-T", type="number", value=1.0, step=0.01),
-                ], width=6),
+                    dbc.Input(id="american-T", type="number", value=2)
+                ], width=6)
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="am-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="american-sigma", type="number", value=0.4)
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Steps (N)"),
-                    dbc.Input(id="am-N", type="number", value=100, step=1),
-                ], width=6),
+                    dbc.Input(id="american-N", type="number", value=200)
+                ], width=6)
             ]),
-            dbc.Row([
-                dbc.Col([
-                    dbc.Label("Option Type"),
-                    dbc.Select(
-                        id="am-option-type",
-                        options=[
-                            {"label": "Call", "value": "call"},
-                            {"label": "Put", "value": "put"}
-                        ],
-                        value="call"
-                    ),
-                ], width=6),
-            ]),
-            dbc.Button("Calculate", id="am-calculate", color="primary", className="mt-3"),
-            html.Div(id="am-result")
+            dbc.Button("Calculate", id="american-calculate", color="primary", className="mt-3"),
+            html.Div(id="american-output")
         ])
     ], label="American Option"),
     
@@ -447,7 +447,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="kiko-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="kiko-T", type="number", value=2, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -463,17 +463,17 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Upper Barrier (U)"),
-                    dbc.Input(id="kiko-U", type="number", value=120, step=0.01),
+                    dbc.Input(id="kiko-U", type="number", value=125, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Cash Rebate (R)"),
-                    dbc.Input(id="kiko-R", type="number", value=0, step=0.01),
+                    dbc.Input(id="kiko-R", type="number", value=1.5, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Number of Observation Times (n)"),
-                    dbc.Input(id="kiko-n", type="number", value=100, step=1),
+                    dbc.Input(id="kiko-n", type="number", value=24, step=1),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Calculate Delta"),
@@ -516,17 +516,18 @@ app.layout = dbc.Container([
 def calculate_black_scholes(n_clicks, S, K, r, q, T, sigma, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = black_scholes(S, K, r, q, T, sigma, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("iv-result", "children"),
@@ -544,17 +545,18 @@ def calculate_black_scholes(n_clicks, S, K, r, q, T, sigma, option_type):
 def calculate_implied_volatility(n_clicks, S, K, r, q, T, market_price, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        sigma = implied_volatility(S, K, r, q, T, market_price, option_type)
+        implied_vol = implied_volatility(S, K, r, q, T, market_price, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Implied Volatility: {sigma:.10f}")
+            html.H5(f"Implied Volatility: {implied_vol:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("ga-result", "children"),
@@ -572,17 +574,18 @@ def calculate_implied_volatility(n_clicks, S, K, r, q, T, market_price, option_t
 def calculate_geometric_asian(n_clicks, S, sigma, r, T, K, n, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = geometric_asian(S, sigma, r, T, K, n, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("aa-result", "children"),
@@ -602,19 +605,20 @@ def calculate_geometric_asian(n_clicks, S, sigma, r, T, K, n, option_type):
 def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price, stderr = arithmetic_asian_mc(S, sigma, r, T, K, n, option_type, num_simulations, control_variate)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}"),
-            html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+            html.H5(f"Option Price: {price:.6f}"),
+            html.H5(f"Standard Error: {stderr:.6f}"),
+            html.H5(f"95% Confidence Interval: [{price-1.96*stderr:.6f}, {price+1.96*stderr:.6f}]")
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("gb-result", "children"),
@@ -634,17 +638,18 @@ def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_
 def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
         price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {price:.6f}"),
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
     Output("ab-result", "children"),
@@ -666,47 +671,64 @@ def calculate_geometric_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, o
 def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
+        price, stderr, conf_interval = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}"),
-            html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+            html.H5(f"Option Price: {price:.6f}"),
+            html.H5(f"Standard Error: {stderr:.6f}"),
+            html.H5(f"95% Confidence Interval: [{conf_interval[0]:.6f}, {conf_interval[1]:.6f}]")
         ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
-    Output("am-result", "children"),
-    [Input("am-calculate", "n_clicks")],
+    Output("american-output", "children"),
+    [Input("american-calculate", "n_clicks")],
     [
-        State("am-S", "value"),
-        State("am-K", "value"),
-        State("am-r", "value"),
-        State("am-T", "value"),
-        State("am-sigma", "value"),
-        State("am-N", "value"),
-        State("am-option-type", "value"),
+        State("american-S", "value"),
+        State("american-K", "value"),
+        State("american-r", "value"),
+        State("american-T", "value"),
+        State("american-sigma", "value"),
+        State("american-N", "value"),
+        State("american-option-type", "value")
     ],
 )
 def calculate_american(n_clicks, S, K, r, T, sigma, N, option_type):
     if n_clicks is None:
         return ""
+    
     try:
-        price = american_binomial(S, K, r, T, sigma, N, option_type)
+        S = float(S)
+        K = float(K)
+        r = float(r)
+        T = float(T)
+        sigma = float(sigma)
+        N = int(N)
+        
+        # Calculate American option price
+        american_price = american_binomial(S, K, r, T, sigma, N, option_type)
+        
+        european_price = black_scholes(S, K, r, 0, T, sigma, option_type)
+        
+        # Calculate early exercise premium
+        early_exercise_premium = american_price - european_price
+        
         return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}")
+            html.H5(f"Option Price: {american_price:.6f}"),
+            html.H5(f"Early Exercise Premium: {early_exercise_premium:.6f}"),
+            html.H5(f"European {option_type.capitalize()} Price: {european_price:.6f}")
         ])
+        
+    except ValueError as e:
+        return f"Error: {str(e)}"
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return f"An error occurred: {str(e)}"
 
 @app.callback(
     Output("kiko-result", "children"),
@@ -727,20 +749,31 @@ def calculate_american(n_clicks, S, K, r, T, sigma, N, option_type):
 def calculate_kiko(n_clicks, S, K, r, T, sigma, L, U, R, n, calculate_delta):
     if n_clicks is None:
         return ""
+    
+    # Validate risk-free rate
+    if r is None or r < 0 or r > 1:
+        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
+    
     try:
-        price, stderr, delta = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
-        return html.Div([
-            html.H4("Results:"),
-            html.P(f"Option Price: {price:.10f}"),
-            html.P(f"Standard Error: {stderr:.10f}"),
-            html.P(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]"),
-            html.P(f"Delta: {delta:.10f}")
-        ])
+        calculate_delta = calculate_delta == "yes"
+        result = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
+        if calculate_delta:
+            price, stderr, conf_interval, delta = result
+            return html.Div([
+                html.H5(f"Option Price: {price:.6f}"),
+                html.H5(f"Standard Error: {stderr:.6f}"),
+                html.H5(f"95% Confidence Interval: [{conf_interval[0]:.6f}, {conf_interval[1]:.6f}]"),
+                html.H5(f"Delta: {delta:.6f}"),
+            ])
+        else:
+            price, stderr, conf_interval = result
+            return html.Div([
+                html.H5(f"Option Price: {price:.6f}"),
+                html.H5(f"Standard Error: {stderr:.6f}"),
+                html.H5(f"95% Confidence Interval: [{conf_interval[0]:.6f}, {conf_interval[1]:.6f}]"),
+            ])
     except Exception as e:
-        return html.Div([
-            html.H4("Error:"),
-            html.P(str(e))
-        ], className="text-danger")
+        return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 if __name__ == "__main__":
     app.run_server(debug=True) 

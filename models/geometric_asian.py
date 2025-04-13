@@ -34,8 +34,8 @@ def geometric_asian(S0, sigma, r, T, K, n, option_type):
         raise ValueError("Strike price K must be positive.")
     if sigma <= 0:
         raise ValueError("Volatility sigma must be positive.")
-    if r < 0:
-        raise ValueError("Risk-free rate r must be non-negative.")
+    if r < 0 or r > 1:
+        raise ValueError("Risk-free rate r must be between 0 and 1.")
     if T <= 0:
         raise ValueError("Time to maturity T must be positive.")
     if n <= 0:
@@ -44,7 +44,8 @@ def geometric_asian(S0, sigma, r, T, K, n, option_type):
         raise ValueError("Option type must be either 'call' or 'put'")
 
     # Calculate adjusted parameters for geometric average
-    sigma_hat = sigma * np.sqrt((2*n + 1)/(6*(n + 1)))
+    
+    sigma_hat = sigma * np.sqrt((n+1) * (2*n + 1)/(6*n**2))
     mu_hat = (r - 0.5*sigma**2)*(n + 1)/(2*n) + 0.5*sigma_hat**2
     
     # Calculate d1 and d2
