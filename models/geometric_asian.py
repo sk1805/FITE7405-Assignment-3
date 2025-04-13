@@ -63,19 +63,21 @@ def geometric_asian(S0, sigma, r, T, K, n, option_type):
 
 if __name__ == "__main__":
     try:
-        S0 = float(input("Enter spot price: "))
-        sigma = float(input("Enter volatility (decimal): "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        K = float(input("Enter strike price: "))
-        n = int(input("Enter number of observation times: "))
-        option_type = input("Enter option type (call/put): ")
+        test_cases = [  
+            (100, 0.3, 0.05, 3, 100, 50, "call"),
+            (100, 0.3, 0.05, 3, 100, 100, "call"),
+            (100, 0.4, 0.05, 3, 100, 50, "call"),
+            (100, 0.3, 0.05, 3, 100, 100, "put"),
+            (100, 0.4, 0.05, 3, 100, 50, "put"),
+            (100, 0.3, 0.05, 3, 100, 50, "put")
+        ]
         
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        
-        price = geometric_asian(S0, sigma, r, T, K, n, option_type)
-        print(f"\n{option_type.capitalize()} option price: {price:.10f}")
+        print("\nRunning test cases...")
+        for S0, sigma, r, T, K, n, option_type in test_cases:
+            price = geometric_asian(S0, sigma, r, T, K, n, option_type)
+            print(f"\nResults for S0: {S0}, sigma: {sigma}, r: {r}, T: {T}, K: {K}, n: {n}, option_type: {option_type}")
+            print(f"Geometric Asian Option price: {price:.10f}")
+            print("--------------------------------")
         
     except ValueError as e:
         print(f"Error: {str(e)}")

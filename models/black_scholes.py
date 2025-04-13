@@ -55,26 +55,20 @@ def black_scholes(S, K, r, q, T, sigma, option_type):
 
     return price
 
-def run():
-    print("\nBlack-Scholes European Option Pricing")
-    print("=====================================")
-    
+if __name__ == "__main__":
     try:
-        S = float(input("Enter spot price: "))
-        K = float(input("Enter strike price: "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        q = float(input("Enter repo rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        sigma = float(input("Enter volatility (decimal): "))
-        option_type = input("Enter option type (call/put): ")
-        price = black_scholes(S, K, r, q, T, sigma, option_type)
+        test_cases = [
+            (100, 100, 0.05, 0.05, 3, 0.3, "call"),
+            (100, 100, 0.05, 0.05, 3, 0.3, "put"),
+        ]
         
-        if option_type not in ['call', 'put']:
-            raise ValueError("Option type must be either 'call' or 'put'")
-        
-        price = black_scholes(S, K, r, q, T, sigma, option_type)
-        print(f"\n{option_type.capitalize()} option price: {price:.10f}")
-        
+        print("\nRunning test cases...")
+        for S, K, r, q, T, sigma, option_type in test_cases:
+            price = black_scholes(S, K, r, q, T, sigma, option_type)
+            print(f"\nResults for S: {S}, K: {K}, r: {r}, q: {q}, T: {T}, sigma: {sigma}, option_type: {option_type}")
+            print(f"Black-Scholes Option price: {price:.10f}")
+            print("--------------------------------")
+
     except ValueError as e:
         print(f"Error: {str(e)}")
     except Exception as e:

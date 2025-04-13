@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 from scipy.optimize import brentq
-from models.black_scholes import black_scholes
+from black_scholes import black_scholes
 
 def implied_volatility(S, K, r, q, T, market_price, option_type):
     """
@@ -59,15 +59,17 @@ def implied_volatility(S, K, r, q, T, market_price, option_type):
 
 if __name__ == "__main__":
     try:
-        S = float(input("Enter spot price: "))
-        K = float(input("Enter strike price: "))
-        r = float(input("Enter risk-free rate (decimal): "))
-        q = float(input("Enter repo rate (decimal): "))
-        T = float(input("Enter time to maturity (years): "))
-        market_price = float(input("Enter option premium: "))
-        option_type = input("Enter option type (call/put): ")
-        implied_vol = implied_volatility(S, K, r, q, T, market_price, option_type)
-        print(f"\nImplied volatility: {implied_vol:.10f}")
+        test_cases = [
+            (100, 100, 0.05, 0.05, 3, 10, "call"),
+            (100, 100, 0.05, 0.05, 3, 10, "put"),
+        ]
+        
+        print("\nRunning test cases...")
+        for S, K, r, q, T, market_price, option_type in test_cases:
+            implied_vol = implied_volatility(S, K, r, q, T, market_price, option_type)
+            print(f"\nResults for S: {S}, K: {K}, r: {r}, q: {q}, T: {T}, market_price: {market_price}, option_type: {option_type}")
+            print(f"Implied volatility: {implied_vol:.10f}")
+            print("--------------------------------")
         
     except ValueError as e:
         print(f"Error: {str(e)}")
