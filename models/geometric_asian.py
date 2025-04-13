@@ -44,7 +44,8 @@ def geometric_asian(S0, sigma, r, T, K, n, option_type):
         raise ValueError("Option type must be either 'call' or 'put'")
 
     # Calculate adjusted parameters for geometric average
-    sigma_hat = sigma * np.sqrt((2*n + 1)/(6*(n + 1)))
+    
+    sigma_hat = sigma * np.sqrt((n+1) * (2*n + 1)/(6*n**2))
     mu_hat = (r - 0.5*sigma**2)*(n + 1)/(2*n) + 0.5*sigma_hat**2
     
     # Calculate d1 and d2

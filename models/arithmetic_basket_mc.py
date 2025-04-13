@@ -1,7 +1,9 @@
 import numpy as np
 from models.geometric_basket import geometric_basket
+from typing import Tuple, List
 
-def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate):
+def arithmetic_basket_mc(S1: float, S2: float, sigma1: float, sigma2: float, r: float, T: float, K: float, rho: float, 
+                        option_type: str, num_simulations: int, control_variate: str) -> Tuple[float, float, List[float]]:
     """
     Calculate the price of an arithmetic basket option using Monte Carlo simulation.
 
@@ -29,6 +31,11 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_
         Number of simulations for Monte Carlo
     control_variate : str
         Control variate method ('none' or 'geometric')
+
+    Returns:
+    --------
+    Tuple[float, float, List[float]]
+        (Option price, Standard error, 95% Confidence interval [lower, upper])
     """
 
     # Validate input parameters
@@ -56,7 +63,7 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_
         raise ValueError("Option type must be either 'call' or 'put'.")
 
     # Set seed for reproducibility
-    np.random.seed(42)
+    np.random.seed(5)
 
     # Simulate correlated standard normals
     Z1 = np.random.normal(0, 1, num_simulations)
@@ -84,23 +91,30 @@ def arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_
         else:
             geo_payoffs = np.maximum(K - geo_avg, 0)
 
+        # Get discounted payoffs first
+        discounted_payoffs = np.exp(-r * T) * payoffs
+        discounted_geo_payoffs = np.exp(-r * T) * geo_payoffs
+
         # Analytical price of geometric basket option
         geo_price = geometric_basket(S1, S2, sigma1, sigma2, r, T, K, rho, option_type)
 
-        # Control variate adjustment
-        cov = np.cov(payoffs, geo_payoffs)[0, 1]
-        var_geo = np.var(geo_payoffs)
+        # Control variate adjustment (using discounted payoffs)
+        cov = np.cov(discounted_payoffs, discounted_geo_payoffs)[0, 1]
+        var_geo = np.var(discounted_geo_payoffs)
         beta = cov / var_geo
 
-        adjusted_payoffs = payoffs - beta * (geo_payoffs - geo_price)
+        # Apply control variate adjustment to discounted payoffs
+        price = np.mean(discounted_payoffs - beta * (discounted_geo_payoffs - geo_price))
+        stderr = np.std(discounted_payoffs - beta * (discounted_geo_payoffs - geo_price)) / np.sqrt(num_simulations)
     else:
-        adjusted_payoffs = payoffs
+        # Standard Monte Carlo
+        price = np.exp(-r * T) * np.mean(payoffs)
+        stderr = np.exp(-r * T) * np.std(payoffs) / np.sqrt(num_simulations)
 
-    # Discounted expected value and standard error
-    price = np.exp(-r * T) * np.mean(adjusted_payoffs)
-    stderr = np.exp(-r * T) * np.std(adjusted_payoffs) / np.sqrt(num_simulations)
+    # Calculate 95% confidence interval
+    conf_interval = [price - 1.96 * stderr, price + 1.96 * stderr]
 
-    return price, stderr
+    return price, stderr, conf_interval
 
 if __name__ == "__main__":
     try:
@@ -123,10 +137,10 @@ if __name__ == "__main__":
         if rho < -1 or rho > 1:
             raise ValueError("Correlation must be between -1 and 1")
         
-        price, stderr = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
+        price, stderr, conf_interval = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         print(f"\n{option_type.capitalize()} option price: {price:.10f}")
         print(f"Standard error: {stderr:.10f}")
-        print(f"95% Confidence Interval: [{price-1.96*stderr:.10f}, {price+1.96*stderr:.10f}]")
+        print(f"95% Confidence Interval: [{conf_interval[0]:.10f}, {conf_interval[1]:.10f}]")
         
     except ValueError as e:
         print(f"Error: {str(e)}")

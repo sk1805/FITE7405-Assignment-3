@@ -36,7 +36,7 @@ def kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta=False):
         (Option price, Standard error) otherwise
     """
     # Set fixed seed for reproducibility
-    np.random.seed(42)
+    np.random.seed(5)
     
     # Validate input parameters
     if S <= 0:

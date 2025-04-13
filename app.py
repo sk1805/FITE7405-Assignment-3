@@ -128,7 +128,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="ga-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="ga-sigma", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -138,7 +138,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="ga-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="ga-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -148,7 +148,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Observations (n)"),
-                    dbc.Input(id="ga-n", type="number", value=100, step=1),
+                    dbc.Input(id="ga-n", type="number", value=50, step=1),
                 ], width=6),
             ]),
             dbc.Row([
@@ -179,7 +179,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="aa-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="aa-sigma", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -189,7 +189,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="aa-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="aa-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -199,7 +199,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Observations (n)"),
-                    dbc.Input(id="aa-n", type="number", value=100, step=1),
+                    dbc.Input(id="aa-n", type="number", value=50, step=1),
                 ], width=6),
             ]),
             dbc.Row([
@@ -216,7 +216,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Simulations (m)"),
-                    dbc.Input(id="aa-num-simulations", type="number", value=10000, step=1000),
+                    dbc.Input(id="aa-num-simulations", type="number", value=100000, step=1000),
                 ], width=6),
             ]),
             dbc.Row([
@@ -253,11 +253,11 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility 1 (σ1)"),
-                    dbc.Input(id="gb-sigma1", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="gb-sigma1", type="number", value=0.3, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility 2 (σ2)"),
-                    dbc.Input(id="gb-sigma2", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="gb-sigma2", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -267,7 +267,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="gb-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="gb-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -314,11 +314,11 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility 1 (σ1)"),
-                    dbc.Input(id="ab-sigma1", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="ab-sigma1", type="number", value=0.3, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Volatility 2 (σ2)"),
-                    dbc.Input(id="ab-sigma2", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="ab-sigma2", type="number", value=0.3, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -328,7 +328,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="ab-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="ab-T", type="number", value=3.0, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -355,7 +355,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Simulations (m)"),
-                    dbc.Input(id="ab-num-simulations", type="number", value=10000, step=1000),
+                    dbc.Input(id="ab-num-simulations", type="number", value=100000, step=1000),
                 ], width=6),
             ]),
             dbc.Row([
@@ -382,31 +382,31 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Spot Price (S(0))"),
-                    dbc.Input(id="am-S", type="number", value=100, step=0.01),
+                    dbc.Input(id="am-S", type="number", value=50, step=1),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="am-K", type="number", value=100, step=0.01),
+                    dbc.Input(id="am-K", type="number", value=40, step=1),
                 ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Risk-free Rate (r)"),
-                    dbc.Input(id="am-r", type="number", value=0.05, step=0.01),
+                    dbc.Input(id="am-r", type="number", value=0.1, step=0.05),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="am-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="am-T", type="number", value=2.0, step=1),
                 ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="am-sigma", type="number", value=0.2, step=0.01),
+                    dbc.Input(id="am-sigma", type="number", value=0.4, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Steps (N)"),
-                    dbc.Input(id="am-N", type="number", value=100, step=1),
+                    dbc.Input(id="am-N", type="number", value=200, step=1),
                 ], width=6),
             ]),
             dbc.Row([
@@ -418,7 +418,7 @@ tabs = [
                             {"label": "Call", "value": "call"},
                             {"label": "Put", "value": "put"}
                         ],
-                        value="call"
+                        value="put"
                     ),
                 ], width=6),
             ]),
@@ -611,9 +611,11 @@ def calculate_arithmetic_asian(n_clicks, S, sigma, r, T, K, n, option_type, num_
         return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
     
     try:
-        price = arithmetic_asian_mc(S, sigma, r, T, K, n, option_type, num_simulations, control_variate)
+        price, stderr = arithmetic_asian_mc(S, sigma, r, T, K, n, option_type, num_simulations, control_variate)
         return html.Div([
             html.H5(f"Option Price: {price:.6f}"),
+            html.H5(f"Standard Error: {stderr:.6f}"),
+            html.H5(f"95% Confidence Interval: [{price-1.96*stderr:.6f}, {price+1.96*stderr:.6f}]")
         ])
     except Exception as e:
         return html.Div(f"Error: {str(e)}", style={"color": "red"})
@@ -675,9 +677,11 @@ def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, 
         return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
     
     try:
-        price = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
+        price, stderr, conf_interval = arithmetic_basket_mc(S1, S2, sigma1, sigma2, r, T, K, rho, option_type, num_simulations, control_variate)
         return html.Div([
             html.H5(f"Option Price: {price:.6f}"),
+            html.H5(f"Standard Error: {stderr:.6f}"),
+            html.H5(f"95% Confidence Interval: [{conf_interval[0]:.6f}, {conf_interval[1]:.6f}]")
         ])
     except Exception as e:
         return html.Div(f"Error: {str(e)}", style={"color": "red"})
