@@ -381,49 +381,49 @@ tabs = [
         html.Div([
             dbc.Row([
                 dbc.Col([
+                    dbc.Label("Option Type"),
+                    dcc.Dropdown(
+                        id='american-option-type',
+                        options=[
+                            {'label': 'Put', 'value': 'put'},
+                            {'label': 'Call', 'value': 'call'}
+                        ],
+                        value='put'
+                    )
+                ], width=12)
+            ]),
+            dbc.Row([
+                dbc.Col([
                     dbc.Label("Spot Price (S(0))"),
-                    dbc.Input(id="am-S", type="number", value=50, step=1),
+                    dbc.Input(id="american-S", type="number", value=50)
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Strike Price (K)"),
-                    dbc.Input(id="am-K", type="number", value=40, step=1),
-                ], width=6),
+                    dbc.Input(id="american-K", type="number", value=40)
+                ], width=6)
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Risk-free Rate (r)"),
-                    dbc.Input(id="am-r", type="number", value=0.1, step=0.05),
+                    dbc.Input(id="american-r", type="number", value=0.1)
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="am-T", type="number", value=2.0, step=1),
-                ], width=6),
+                    dbc.Input(id="american-T", type="number", value=2)
+                ], width=6)
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Volatility (σ)"),
-                    dbc.Input(id="am-sigma", type="number", value=0.4, step=0.01),
+                    dbc.Input(id="american-sigma", type="number", value=0.4)
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Number of Steps (N)"),
-                    dbc.Input(id="am-N", type="number", value=200, step=1),
-                ], width=6),
+                    dbc.Input(id="american-N", type="number", value=200)
+                ], width=6)
             ]),
-            dbc.Row([
-                dbc.Col([
-                    dbc.Label("Option Type"),
-                    dbc.Select(
-                        id="am-option-type",
-                        options=[
-                            {"label": "Call", "value": "call"},
-                            {"label": "Put", "value": "put"}
-                        ],
-                        value="put"
-                    ),
-                ], width=6),
-            ]),
-            dbc.Button("Calculate", id="am-calculate", color="primary", className="mt-3"),
-            html.Div(id="am-result")
+            dbc.Button("Calculate", id="american-calculate", color="primary", className="mt-3"),
+            html.Div(id="american-output")
         ])
     ], label="American Option"),
     
@@ -447,7 +447,7 @@ tabs = [
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Time to Maturity (T)"),
-                    dbc.Input(id="kiko-T", type="number", value=1.0, step=0.01),
+                    dbc.Input(id="kiko-T", type="number", value=2, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
@@ -463,17 +463,17 @@ tabs = [
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Upper Barrier (U)"),
-                    dbc.Input(id="kiko-U", type="number", value=120, step=0.01),
+                    dbc.Input(id="kiko-U", type="number", value=125, step=0.01),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Cash Rebate (R)"),
-                    dbc.Input(id="kiko-R", type="number", value=0, step=0.01),
+                    dbc.Input(id="kiko-R", type="number", value=1.5, step=0.01),
                 ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Number of Observation Times (n)"),
-                    dbc.Input(id="kiko-n", type="number", value=100, step=1),
+                    dbc.Input(id="kiko-n", type="number", value=24, step=1),
                 ], width=6),
                 dbc.Col([
                     dbc.Label("Calculate Delta"),
@@ -687,33 +687,48 @@ def calculate_arithmetic_basket(n_clicks, S1, S2, sigma1, sigma2, r, T, K, rho, 
         return html.Div(f"Error: {str(e)}", style={"color": "red"})
 
 @app.callback(
-    Output("am-result", "children"),
-    [Input("am-calculate", "n_clicks")],
+    Output("american-output", "children"),
+    [Input("american-calculate", "n_clicks")],
     [
-        State("am-S", "value"),
-        State("am-K", "value"),
-        State("am-r", "value"),
-        State("am-T", "value"),
-        State("am-sigma", "value"),
-        State("am-N", "value"),
-        State("am-option-type", "value"),
+        State("american-S", "value"),
+        State("american-K", "value"),
+        State("american-r", "value"),
+        State("american-T", "value"),
+        State("american-sigma", "value"),
+        State("american-N", "value"),
+        State("american-option-type", "value")
     ],
 )
 def calculate_american(n_clicks, S, K, r, T, sigma, N, option_type):
     if n_clicks is None:
         return ""
     
-    # Validate risk-free rate
-    if r is None or r < 0 or r > 1:
-        return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
-    
     try:
-        price = american_binomial(S, K, r, T, sigma, N, option_type)
+        S = float(S)
+        K = float(K)
+        r = float(r)
+        T = float(T)
+        sigma = float(sigma)
+        N = int(N)
+        
+        # Calculate American option price
+        american_price = american_binomial(S, K, r, T, sigma, N, option_type)
+        
+        european_price = black_scholes(S, K, r, 0, T, sigma, option_type)
+        
+        # Calculate early exercise premium
+        early_exercise_premium = american_price - european_price
+        
         return html.Div([
-            html.H5(f"Option Price: {price:.6f}"),
+            html.H5(f"Option Price: {american_price:.6f}"),
+            html.H5(f"Early Exercise Premium: {early_exercise_premium:.6f}"),
+            html.H5(f"European {option_type.capitalize()} Price: {european_price:.6f}")
         ])
+        
+    except ValueError as e:
+        return f"Error: {str(e)}"
     except Exception as e:
-        return html.Div(f"Error: {str(e)}", style={"color": "red"})
+        return f"An error occurred: {str(e)}"
 
 @app.callback(
     Output("kiko-result", "children"),
@@ -740,17 +755,22 @@ def calculate_kiko(n_clicks, S, K, r, T, sigma, L, U, R, n, calculate_delta):
         return html.Div("Error: Risk-free rate (r) must be between 0 and 1", style={"color": "red"})
     
     try:
+        calculate_delta = calculate_delta == "yes"
         result = kiko_quasi_mc(S, K, r, T, sigma, L, U, R, n, calculate_delta)
         if calculate_delta:
-            price, delta = result
+            price, stderr, conf_interval, delta = result
             return html.Div([
                 html.H5(f"Option Price: {price:.6f}"),
+                html.H5(f"Standard Error: {stderr:.6f}"),
+                html.H5(f"95% Confidence Interval: [{conf_interval[0]:.6f}, {conf_interval[1]:.6f}]"),
                 html.H5(f"Delta: {delta:.6f}"),
             ])
         else:
-            price = result
+            price, stderr, conf_interval = result
             return html.Div([
                 html.H5(f"Option Price: {price:.6f}"),
+                html.H5(f"Standard Error: {stderr:.6f}"),
+                html.H5(f"95% Confidence Interval: [{conf_interval[0]:.6f}, {conf_interval[1]:.6f}]"),
             ])
     except Exception as e:
         return html.Div(f"Error: {str(e)}", style={"color": "red"})

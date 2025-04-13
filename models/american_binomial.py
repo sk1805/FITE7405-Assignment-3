@@ -26,8 +26,8 @@ def american_binomial(S, K, r, T, sigma, N, option_type):
         raise ValueError("Spot price S must be positive.")
     if K <= 0:
         raise ValueError("Strike price K must be positive.")
-    if r < 0 or r > 1:
-        raise ValueError("Risk-free rate r must be between 0 and 1.")
+    if r < 0:
+        raise ValueError("Risk-free rate r must be non-negative.")
     if T <= 0:
         raise ValueError("Time to maturity T must be positive.")
     if sigma <= 0:
