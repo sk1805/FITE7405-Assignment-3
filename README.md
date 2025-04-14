@@ -1,43 +1,83 @@
-# Option Pricing Models
+# Option Pricing Calculator
 
-A comprehensive Python implementation of various option pricing models.
+A web-based option pricing calculator that implements various option pricing models including European Options (Black-Scholes), Implied Volatility, Geometric Asian, Arithmetic Asian, Geometric Basket, Arithmetic Basket, American Options, and KIKO Put Options.
 
-## Features
+## Group 30
+- Abhimanyu Bhati
+- Sameer Kabani
 
-- **Black-Scholes Model**
-  - European call/put options
-  - Implied volatility calculation
+## Setup Instructions
 
-- **Asian Options**
-  - Geometric Asian (closed-form)
-  - Arithmetic Asian (Monte Carlo with control variate)
-
-- **Basket Options**
-  - Geometric basket (closed-form)
-  - Arithmetic basket (Monte Carlo with control variate)
-
-- **American Options**
-  - Binomial tree method
-
-- **KIKO Put Options**
-  - Quasi-Monte Carlo simulation
-  - Delta calculation
-
-## Installation
-
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/sk1805/FITE7405-Assignment-3.git
+cd FITE7405-Assignment-3
+```
+
+### 2. Create and Activate Virtual Environment
+
+#### For Windows:
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+venv\Scripts\activate
+```
+
+#### For macOS/Linux:
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-## Usage
-
-Run the program using either:
-
+### 4. Run the Application
 ```bash
-# For command-line interface
-python main.py
-
-# For graphical user interface
 python app.py
 ```
+
+### 5. Access the Application
+Open your web browser and navigate to:
+```
+http://localhost:8050
+```
+
+## Features
+
+The application provides pricing calculations for:
+- European Options (Black-Scholes)
+- Implied Volatility
+- Geometric Asian Options
+- Arithmetic Asian Options (Monte Carlo)
+- Geometric Basket Options
+- Arithmetic Basket Options (Monte Carlo)
+- American Options (Binomial)
+- KIKO Put Options (Quasi-Monte Carlo)
+
+## Usage
+
+1. Select the desired option type from the tabs
+2. Enter the required parameters:
+   - Spot Price (S)
+   - Strike Price (K)
+   - Risk-free Rate (r)
+   - Time to Maturity (T)
+   - Volatility (σ)
+   - Additional parameters specific to each option type
+3. Click "Calculate" to get the option price and additional metrics
+
+## Additional Information
+
+- Monte Carlo simulations provide confidence intervals and standard errors
+- American options show early exercise premiums
+- KIKO options include delta calculations
+- Arithmetic options support control variate methods for variance reduction
+
