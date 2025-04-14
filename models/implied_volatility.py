@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 from scipy.optimize import brentq
-from black_scholes import black_scholes
+from .black_scholes import black_scholes
 
 def implied_volatility(S, K, r, q, T, market_price, option_type):
     """

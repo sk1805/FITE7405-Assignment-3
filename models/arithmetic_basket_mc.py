@@ -1,5 +1,5 @@
 import numpy as np
-from geometric_basket import geometric_basket
+from .geometric_basket import geometric_basket
 from typing import Tuple, List
 
 def arithmetic_basket_mc(S1: float, S2: float, sigma1: float, sigma2: float, r: float, T: float, K: float, rho: float, 

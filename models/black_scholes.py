@@ -40,26 +40,37 @@ def black_scholes(S, K, r, q, T, sigma, option_type):
         raise ValueError("Time to maturity T must be positive.")
     if sigma <= 0:
         raise ValueError("Volatility sigma must be positive.")
-    if option_type not in ['call', 'put']:
+    if option_type.lower() not in ['call', 'put']:
         raise ValueError("Option type must be either 'call' or 'put'")
 
     # Calculate d1 and d2
     d1 = (np.log(S / K) + (r - q + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma * np.sqrt(T)
 
-    # Calculate option price based on type
-    if option_type == 'call':
-        price = S * np.exp(-q * T) * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
-    else:
-        price = K * np.exp(-r * T) * norm.cdf(-d2) - S * np.exp(-q * T) * norm.cdf(-d1)
+    # Calculate discount factors
+    disc_S = np.exp(-q * T)
+    disc_K = np.exp(-r * T)
 
-    return price
+    # Calculate option price based on type
+    if option_type.lower() == 'call':
+        price = S * disc_S * norm.cdf(d1) - K * disc_K * norm.cdf(d2)
+    else:  # put option
+        price = K * disc_K * norm.cdf(-d2) - S * disc_S * norm.cdf(-d1)
+
+    return round(price, 10)
 
 if __name__ == "__main__":
     try:
         test_cases = [
+            # At-the-money options
             (100, 100, 0.05, 0.05, 3, 0.3, "call"),
             (100, 100, 0.05, 0.05, 3, 0.3, "put"),
+            # Out-of-the-money options
+            (100, 110, 0.05, 0.05, 3, 0.3, "call"),
+            (100, 90, 0.05, 0.05, 3, 0.3, "put"),
+            # In-the-money options
+            (100, 90, 0.05, 0.05, 3, 0.3, "call"),
+            (100, 110, 0.05, 0.05, 3, 0.3, "put"),
         ]
         
         print("\nRunning test cases...")
@@ -67,7 +78,7 @@ if __name__ == "__main__":
             price = black_scholes(S, K, r, q, T, sigma, option_type)
             print(f"\nResults for S: {S}, K: {K}, r: {r}, q: {q}, T: {T}, sigma: {sigma}, option_type: {option_type}")
             print(f"Black-Scholes Option price: {price:.10f}")
-            print("--------------------------------")
+            print("--------------------------------", flush=True)
 
     except ValueError as e:
         print(f"Error: {str(e)}")

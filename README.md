@@ -50,6 +50,33 @@ Open your web browser and navigate to:
 http://localhost:8050
 ```
 
+## Running Test Cases
+
+The project includes a comprehensive test suite for all option pricing models. To run the tests:
+
+```bash
+python models/test_scripts.py
+```
+
+This will execute test cases for all models:
+- Black-Scholes (European Options)
+- American Binomial Options
+- Arithmetic Asian Monte Carlo
+- Arithmetic Basket Monte Carlo
+- Geometric Asian Options
+- Geometric Basket Options
+- Implied Volatility
+- KIKO Quasi-Monte Carlo
+
+Test results will show:
+- Input parameters used
+- Calculated option prices
+- Additional metrics (where applicable):
+  - Standard errors
+  - Confidence intervals
+  - Delta values
+  - Control variate comparisons
+
 ## Features
 
 The application provides pricing calculations for:
